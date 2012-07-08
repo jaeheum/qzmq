@@ -36,7 +36,8 @@
 #define zh z->h
 #define zi z->i
 #define zj z->j
-#define VSK(x) (V*)(intptr_t)(atoll(x->s))
+#define VSK(x) (V*)(intptr_t)(x->j)
+#define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
 
@@ -45,7 +46,7 @@ Z K qstr(S s){if(s!=NULL){I n=strlen(s); R kpn(s,n);}else{R kp(" ");}}
 ZS cstr(K x){if(abs(xt)!=KG&&abs(xt)!=KC)R NULL;
     if(xt>0){S s=(S)malloc(xn+1); memcpy(s, xG, xn); s[xn]=0; R s;}
     else{S s=(S)malloc(1+1); memcpy(s, &xg, 1); s[1]=0; R s;}}
-Z K sym(V*x){if(x){C s[22]; snprintf(s, sizeof(s), "%lld", kj((intptr_t)x)->j); R ks(s);}else{R(K)0;}}
+Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}}
 
 static K attachedfn;
 static K detachedfn;
@@ -57,8 +58,8 @@ Z K1(zclocktime){x=(K)0;R(kj(zclock_time()));}
 Z K1(zclocklog){S s=cstr(x); zclock_log(s); free(s); R(K)0;}
 Z K1(zclocktest){R ki(zclock_test(xg));}
 
-Z K1(zctxnew){x=(K)0; zctx_t*ctx=zctx_new(); P(ctx, sym(ctx)); R KRR(errno);} 
-Z K1(zctxdestroy){zctx_t*ctx=(zctx_t*)(intptr_t)(atoll(xs)); zctx_destroy(&ctx); R(K)0;} 
+Z K1(zctxnew){x=(K)0; zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
+Z K1(zctxdestroy){ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
 Z K2(zctxsetiothreads){zctx_set_iothreads(VSK(x), yi); R(K)0;}
 Z K2(zctxsetlinger){zctx_set_linger(VSK(x), yi); R(K)0;}
 Z K2(zctxsethwm){zctx_set_hwm(VSK(x), yi); R(K)0;}
@@ -74,15 +75,15 @@ Z K1(zfilesize){R kj(zfile_size(path(x)));}
 Z K1(zfiletest){R ki(zfile_test(xg));}
 
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
-    if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, sym(f)); R(K)0;}
-    else{zframe_t*f=zframe_new(&xg, 1); P(f, sym(f)); R(K)0;}}
-Z K1(zframedestroy){zframe_t*f=(zframe_t*)(intptr_t)(atoll(xs)); zframe_destroy(&f); R(K)0;}
-Z K1(zframerecv){zframe_t*f=zframe_recv(VSK(x)); P(f, sym(f)); R(K)0;}
-Z K1(zframerecvnowait){zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, sym(f)); R(K)0;}
-Z K3(zframesend){zframe_t*f=(zframe_t*)(intptr_t)(atoll(xs)); R ki(zframe_send(&f, VSK(y), zi));}
+    if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, ptr(f)); R(K)0;}
+    else{zframe_t*f=zframe_new(&xg, 1); P(f, ptr(f)); R(K)0;}}
+Z K1(zframedestroy){ZTK(zframe_t,f); zframe_destroy(&f); R(K)0;}
+Z K1(zframerecv){zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
+Z K1(zframerecvnowait){zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
+Z K3(zframesend){ZTK(zframe_t,f); R ki(zframe_send(&f, VSK(y), zi));}
 Z K1(zframesize){R kj(zframe_size(VSK(x)));}
 // zframe_data() is unsafe, too low-level for q.
-Z K1(zframedup){R sym(zframe_dup(VSK(x)));}
+Z K1(zframedup){R ptr(zframe_dup(VSK(x)));}
 //Z K1(zframestrhex){R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
 Z K1(zframestrdup){I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
 Z K1(zframemore){R ki(zframe_more(VSK(x)));}
@@ -92,14 +93,14 @@ Z K2(zframeprint){S s=cstr(y); zframe_print(VSK(x), s); free(s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
 
-Z K1(zmsgnew){x=(K)0; zmsg_t*m=zmsg_new(); P(m, sym(m)); R(K)0;}
-Z K1(zmsgdestroy){zmsg_t*m=(zmsg_t*)(intptr_t)(atoll(xs)); zmsg_destroy(&m); R(K)0;}
-Z K1(zmsgrecv){R sym(zmsg_recv(VSK(x)));}
-Z K2(zmsgsend){zmsg_t*m=(zmsg_t*)(intptr_t)(atoll(xs)); zmsg_send(&m, VSK(y)); R(K)0;}
+Z K1(zmsgnew){x=(K)0; zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
+Z K1(zmsgdestroy){ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
+Z K1(zmsgrecv){R ptr(zmsg_recv(VSK(x)));}
+Z K2(zmsgsend){ZTK(zmsg_t,m); zmsg_send(&m, VSK(y)); R(K)0;}
 Z K1(zmsgsize){R kj(zmsg_size(VSK(x)));}
 Z K1(zmsgcontentsize){R kj(zmsg_content_size(VSK(x)));}
 Z K2(zmsgpush){zmsg_push(VSK(x), VSK(y)); R(K)0;}
-Z K1(zmsgpop){P(zmsg_size(VSK(x))>0, sym(zmsg_pop(VSK(x)))); R krr("empty");}
+Z K1(zmsgpop){P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
 Z K2(zmsgadd){zmsg_add(VSK(x), VSK(y)); R(K)0;}
 //Z K3(zmsgpushmem){zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
 //Z K3(zmsgaddmem){zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
@@ -107,21 +108,21 @@ Z K2(zmsgadd){zmsg_add(VSK(x), VSK(y)); R(K)0;}
 //Z K2(zmsgaddstr){S s=cstr(y); zmsg_addstr(VSK(x), s); free(s); R(K)0;}
 //Z K1(zmsgpopstr){R kp(zmsg_popstr(VSK(x)));}
 Z K2(zmsgwrap){zmsg_wrap(VSK(x), VSK(y));R(K)0;}
-Z K1(zmsgunwrap){R sym(zmsg_unwrap(VSK(x)));}
+Z K1(zmsgunwrap){R ptr(zmsg_unwrap(VSK(x)));}
 Z K2(zmsgremove){zmsg_remove(VSK(x), VSK(y)); R(K)0;}
-Z K1(zmsgfirst){P(zmsg_size(VSK(x))>0, sym(zmsg_first(VSK(x)))); R krr("empty");}
-Z K1(zmsgnext){P(zmsg_size(VSK(x))>0, sym(zmsg_next(VSK(x))));  R krr("empty");}
-Z K1(zmsglast){P(zmsg_size(VSK(x))>0, sym(zmsg_last(VSK(x)))); R krr("empty");}
+Z K1(zmsgfirst){P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
+Z K1(zmsgnext){P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
+Z K1(zmsglast){P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
 Z K2(zmsgsave){FILE*f=fopen(path(y), "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
-Z K2(zmsgload){FILE*f=fopen(path(y), "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R sym(m);}
+Z K2(zmsgload){FILE*f=fopen(path(y), "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 //TODO(hjh): use kdb for saving/loading
 //Z K2(zmsgencode){R kj(zmsg_encode(VSK(x), VSK(y)));}
-//Z K2(zmsgdecode){R sym(zmsg_decode(VSK(x), N(y))); R(K)0;}
-Z K1(zmsgdup){zmsg_t*m=zmsg_dup(VSK(x)); P(m,sym(m)); R(K)0;}
+//Z K2(zmsgdecode){R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
+Z K1(zmsgdup){zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
 Z K1(zmsgdump){zmsg_dump(VSK(x)); R(K)0;}
 Z K1(zmsgtest){R ki(zmsg_test(xg));}
 
-Z K2(zsocketnew){R sym(zsocket_new(VSK(x), yi));}
+Z K2(zsocketnew){R ptr(zsocket_new(VSK(x), yi));}
 Z K2(zsocketdestroy){zsocket_destroy(VSK(x), VSK(y)); R(K)0;}
 Z K2(zsocketbind){R ki(zsocket_bind(VSK(x), ys));}
 Z K2(zsocketconnect){zsocket_connect(VSK(x), ys); R(K)0;}
@@ -251,7 +252,7 @@ Z K2(zthreadnew){
 
 // typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 ZV af(V*args, zctx_t*ctx, V*pipe){
-    K x=k(0, ".", attachedfn, knk(3, args, sym(ctx), sym(pipe)), 0);
+    K x=k(0, ".", attachedfn, knk(3, args, ptr(ctx), ptr(pipe)), 0);
     if(xt==-128){O("k() error: %s\n", xs);}
     r0(x); m9();}
 // void* zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
@@ -261,7 +262,7 @@ Z K3(zthreadfork){
     setattachedfn(y);
     V*pipe=zthread_fork(VSK(r1(x)), af, r1(z));
     r0(y);
-    if(pipe){R sym(pipe);}else{R krr("fork");}}
+    if(pipe){R ptr(pipe);}else{R krr("fork");}}
 
 // libzmq
 Z K1(version){x=(K)0; K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
