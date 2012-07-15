@@ -30,8 +30,10 @@
 #define K4(f) K f(K x,K y,K z,K z4)
 #define K5(f) K f(K x,K y,K z,K z4,K z5)
 #define yG y->G0
+#define yg TX(G,y)
 #define yi y->i
 #define yn y->n
+#define yt y->t
 #define ys y->s
 #define zh z->h
 #define zi z->i
@@ -40,12 +42,10 @@
 #define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
+#define CSTR(x) S s;if(x->n!=1){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;}
 
 ZI N(K x){if(xt>0)R xn;R 1;}
-Z K qstr(S s){if(s!=NULL){I n=strlen(s); R kpn(s,n);}else{R kp(" ");}}
-ZS cstr(K x){if(abs(xt)!=KG&&abs(xt)!=KC)R NULL;
-    if(xt>0){S s=(S)malloc(xn+1); memcpy(s, xG, xn); s[xn]=0; R s;}
-    else{S s=(S)malloc(1+1); memcpy(s, &xg, 1); s[1]=0; R s;}}
+Z K qstr(S s){R s!=NULL?kp(s):(K)0;}
 Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}}
 
 static K attachedfn;
@@ -55,7 +55,7 @@ ZV setdetachedfn(K x){r1(x);detachedfn=x;}
 
 Z K1(zclocksleep){zclock_sleep(xi); R(K)0;}
 Z K1(zclocktime){x=(K)0;R(kj(zclock_time()));}
-Z K1(zclocklog){S s=cstr(x); zclock_log(s); free(s); R(K)0;}
+Z K1(zclocklog){CSTR(x); zclock_log(s); R(K)0;}
 Z K1(zclocktest){R ki(zclock_test(xg));}
 
 Z K1(zctxnew){x=(K)0; zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
@@ -67,11 +67,11 @@ Z K1(zctxgethwm){R ki(zctx_hwm(VSK(x)));}
 Z K1(zctxinterrupted){x=(K)0; R kb(zctx_interrupted);}
 Z K1(zctxtest){R ki(zctx_test(xg));}
 
-ZS path(K x){S p=strstr(xs, ":"); R ++p;} // path from :path from `:path
-Z K1(zfiledelete){R ki(zfile_delete(path(x)));}
-Z K1(zfilemkdir){R ki(zfile_mkdir(path(x)));}
-Z K1(zfileexists){R ki(zfile_exists(path(x)));}
-Z K1(zfilesize){R kj(zfile_size(path(x)));}
+// zfile `:path
+Z K1(zfiledelete){R ki(zfile_delete(++xs));}
+Z K1(zfilemkdir){R ki(zfile_mkdir(++xs));}
+Z K1(zfileexists){R ki(zfile_exists(++xs));}
+Z K1(zfilesize){R kj(zfile_size(++xs));}
 Z K1(zfiletest){R ki(zfile_test(xg));}
 
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
@@ -88,8 +88,8 @@ Z K1(zframedup){R ptr(zframe_dup(VSK(x)));}
 Z K1(zframestrdup){I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
 Z K1(zframemore){R ki(zframe_more(VSK(x)));}
 Z K2(zframeeq){R kb(zframe_eq(VSK(x), VSK(y)));}
-Z K2(zframestreq){S s=cstr(y); K z=kb(zframe_streq(VSK(x), s)); free(s); R z;}
-Z K2(zframeprint){S s=cstr(y); zframe_print(VSK(x), s); free(s); R(K)0;}
+Z K2(zframestreq){CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
+Z K2(zframeprint){CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
 
@@ -104,8 +104,8 @@ Z K1(zmsgpop){P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
 Z K2(zmsgadd){zmsg_add(VSK(x), VSK(y)); R(K)0;}
 //Z K3(zmsgpushmem){zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
 //Z K3(zmsgaddmem){zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
-//Z K2(zmsgpushstr){S s=cstr(y); zmsg_pushstr(VSK(x), s); free(s); R(K)0;}
-//Z K2(zmsgaddstr){S s=cstr(y); zmsg_addstr(VSK(x), s); free(s); R(K)0;}
+//Z K2(zmsgpushstr){CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
+//Z K2(zmsgaddstr){CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
 //Z K1(zmsgpopstr){R kp(zmsg_popstr(VSK(x)));}
 Z K2(zmsgwrap){zmsg_wrap(VSK(x), VSK(y));R(K)0;}
 Z K1(zmsgunwrap){R ptr(zmsg_unwrap(VSK(x)));}
@@ -113,8 +113,8 @@ Z K2(zmsgremove){zmsg_remove(VSK(x), VSK(y)); R(K)0;}
 Z K1(zmsgfirst){P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
 Z K1(zmsgnext){P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
 Z K1(zmsglast){P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
-Z K2(zmsgsave){FILE*f=fopen(path(y), "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
-Z K2(zmsgload){FILE*f=fopen(path(y), "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
+Z K2(zmsgsave){FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
+Z K2(zmsgload){FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 //TODO(hjh): use kdb for saving/loading
 //Z K2(zmsgencode){R kj(zmsg_encode(VSK(x), VSK(y)));}
 //Z K2(zmsgdecode){R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
@@ -159,7 +159,7 @@ Z K1(zsocketevents){R ki(zsocket_events(VSK(x)));}
 Z K2(zsocketsethwm){zsocket_set_hwm(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetswap){zsocket_set_swap(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetaffinity){zsocket_set_affinity(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetidentity){S s=cstr(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); free(s); R(K)0;}
+Z K2(zsocketsetidentity){CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
 Z K2(zsocketsetrate){zsocket_set_rate(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetrecovery_ivl){zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetrecovery_ivl_msec){zsocket_set_recovery_ivl_msec(VSK(x), yi); R(K)0;}
@@ -207,7 +207,7 @@ Z K2(zsocketsetrcvhwm){zsocket_set_rcvhwm(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetaffinity){zsocket_set_affinity(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetsubscribe){zsocket_set_subscribe(VSK(x), ys); R(K)0;}
 Z K2(zsocketsetunsubscribe){zsocket_set_unsubscribe(VSK(x), ys); R(K)0;}
-Z K2(zsocketsetidentity){S s=cstr(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); free(s); R(K)0;}
+Z K2(zsocketsetidentity){CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
 Z K2(zsocketsetrate){zsocket_set_rate(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetrecovery_ivl){zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
 Z K2(zsocketsetsndbuf){zsocket_set_sndbuf(VSK(x), yi); R(K)0;}
@@ -227,14 +227,20 @@ Z K2(zsocketsethwm){zsocket_set_hwm(VSK(x), yi); R(K)0;}
 #endif
 Z K1(zsockopttest){R ki(zsockopt_test(xg));}
 
-// zstr_recv* returns string with trailing \0. Drop \0 with qstr().
-Z K1(zstrrecv){R qstr(zstr_recv(VSK(x)));}
-Z K1(zstrrecvnowait){R qstr(zstr_recv_nowait(VSK(x)));}
-Z K2(zstrsend){S s=cstr(y); K z=ki(zstr_send(VSK(x), s)); free(s); R z;}
-Z K2(zstrsendm){S s=cstr(y); K z=ki(zstr_sendm(VSK(x), s)); free(s); R z;}
-// XXX formatted string or varargs
-// Z K2(zstrsendf){R ki(zstr_sendf(VSK(x), cstr(y)));}
-// Z K2(zstrsendfm){R ki(zstr_sendfm(VSK(x), cstr(y)));}
+// send/receive q char vector (not for byte vectors or serialized objects)
+// zstr_recv* returns C string with a trailing \0. Convert it to q char vector and free the poor thing.
+Z K1(zstrrecv){S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
+Z K1(zstrrecvnowait){S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
+Z K2(zstrsend){r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
+Z K2(zstrsendm){r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
+// zero-copy or zmq_msg_init_data() takes over the ownership of kC(y) or yG buffer (but we don't let it write/free yG).
+Z K2(zstrsend0){r1(y); zmq_msg_t msg; // keep y in place at least (q main thread owns y)
+    if(yt>0){zmq_msg_init_data(&msg, (S)kC(y), yn, NULL, NULL);}
+    else{zmq_msg_init_data(&msg, &yg, 1, NULL, NULL);}
+    I rc=zmq_sendmsg (VSK(x), &msg, 0);
+    zmq_msg_close (&msg);
+    R rc==0?y:(K)0;}
+
 Z K1(zstrtest){R ki(zstr_test(xg));}
 
 //typedef void *(zthread_detached_fn) (void *args);
@@ -439,8 +445,7 @@ Z czmqzpi zstrapi[]={
     {"recv_nowait", zstrrecvnowait, 1},
     {"send", zstrsend, 2},
     {"sendm", zstrsendm, 2},
-//    {"sendf", zstrsendf, 2},
-//    {"sendfm", zstrsendfm, 2},
+    {"send0", zstrsend0, 2},
     {"test", zstrtest, 1},};
 Z czmqzpi zthreadapi[] = {
     {"new", zthreadnew, 2},
