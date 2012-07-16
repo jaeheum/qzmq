@@ -3,6 +3,7 @@ zclock:(`qzmq 2:(`zclock;1))`
 zctx:(`qzmq 2:(`zctx;1))`
 zfile:(`qzmq 2:(`zfile;1))`
 zframe:(`qzmq 2:(`zframe;1))`
+zloop:(`qzmq 2:(`zloop;1))`
 zmsg:(`qzmq 2:(`zmsg;1))`
 zsocket:(`qzmq 2:(`zsocket;1))`
 zsockopt:(`qzmq 2:(`zsockopt;1))`

@@ -45,6 +45,23 @@ end:0b; while[not end; frame:zframe.recv[input]; zframe.print[frame; "recv:"]; i
 zctx.destroy[ctx]
 "pass"
 //  --------------------------------------------------------------------------
+"running zloop test"
+ctx:zctx.new[]
+output:zsocket.new[ctx; zmq.PAIR]
+outputport:zsocket.bind[output; `inproc://zloop.test]
+input:zsocket.new[ctx; zmq.PAIR]
+zsocket.connect[input; `inproc://zloop.test]
+loop:zloop.new[]
+zloop.set_verbose[loop; 0b]
+timer_event:{[loop;item;arg] zstr.send[output; "PING"]; :0}
+if[0<>rc:zloop.timer[loop; 10; 1; `timer_event; output]; '`fail]
+socket_event:{[loop;item;arg] :-1}
+if[0<>rc:zloop.poller[loop; (input;0;zmq.POLLIN;0h); `socket_event; "socket_event"]; '`fail]
+if[-1<>rc:zloop.start[loop]; '`fail] / "Returns 0 if interrupted, -1 if cancelled by a handler."
+zloop.destroy[loop]
+zctx.destroy[ctx]
+"pass"
+//  --------------------------------------------------------------------------
 "running zmsg test"
 ctx:zctx.new[]
 output:zsocket.new[ctx; zmq.PAIR]

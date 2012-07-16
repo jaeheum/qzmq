@@ -30,8 +30,10 @@
 #define K4(f) K f(K x,K y,K z,K z4)
 #define K5(f) K f(K x,K y,K z,K z4,K z5)
 #define yG y->G0
+#define yK ((K*)yG)
 #define yg TX(G,y)
 #define yi y->i
+#define yj y->j
 #define yn y->n
 #define yt y->t
 #define ys y->s
@@ -92,6 +94,48 @@ Z K2(zframestreq){CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
 Z K2(zframeprint){CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
+
+static K eventfn;
+static K timerfn;
+ZV seteventfn(K x){r1(x);eventfn=x;}
+ZV settimerfn(K x){r1(x);timerfn=x;}
+Z K1(zloopnew){x=(K)0; zloop_t*l=zloop_new(); P(l, ptr(l)); R(K)0;}
+Z K1(zloopdestroy){ZTK(zloop_t,l); zloop_destroy(&l); R(K)0;}
+//typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
+ZI event_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
+  K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=ptr(item); kK(w)[2]=ptr(args);
+  K x=k(0, ".", eventfn, w, (K)0);
+  if(xt==-128){O("k() error: %s\n", xs);}
+  R xi;}
+ZV*silence(zmq_pollitem_t*item){R item;}
+//typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
+ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
+  silence(item); // for the compiler
+  K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=kj(0); /* item is null for timer */; kK(w)[2]=ptr(args);
+  K x=k(0, ".", timerfn, w, (K)0);
+  if(xt==-128){O("k() error: %s\n", xs);}
+  R xi;}
+//    zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
+Z K4(zlooppoller){
+    ZTK(zloop_t, loop);
+    seteventfn(z);
+    if(yt==0){zmq_pollitem_t item={VSK(yK[0]), yK[1]->i, yK[2]->h,yK[3]->h};
+    R ki(zloop_poller(loop, &item, event_loop_fn, z4));}
+    else{O("incorrect polling items"); R ki(-1);}}
+Z K2(zlooppollerend){zloop_poller_end(VSK(x), VSK(y)); R(K)0;}
+// zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
+Z K5(zlooptimer){
+    ZTK(zloop_t,loop);
+    settimerfn(z4);
+    I rc=zloop_timer(loop, yj, zj, timer_loop_fn, z5);
+    R ki(rc);}
+Z K2(zlooptimerend){zloop_timer_end(VSK(x), VSK(y)); R(K)0;}
+Z K2(zloopsetverbose){ZTK(zloop_t,loop); zloop_set_verbose(loop, y->g); R(K)0;}
+Z K1(zloopstart){
+    ZTK(zloop_t,loop);  
+    I rc=zloop_start(loop);
+    R ki(rc);}
+Z K1(zlooptest){R ki(zloop_test(xg));}
 
 Z K1(zmsgnew){x=(K)0; zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
 Z K1(zmsgdestroy){ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
@@ -311,6 +355,16 @@ Z czmqzpi zframeapi[]={
     {"print", zframeprint, 2},
     {"reset", zframereset, 2},
     {"test", zframetest, 1},};
+Z czmqzpi zloopapi[]={
+    {"new", zloopnew, 1},
+    {"destroy", zloopdestroy, 1},
+    {"poller", zlooppoller, 4},
+    {"poller_end", zlooppollerend, 2},
+    {"timer", zlooptimer, 5},
+    {"timer_end", zlooptimerend, 2},
+    {"set_verbose", zloopsetverbose, 2},
+    {"start", zloopstart, 1},
+    {"test", zlooptest, 1},};
 Z czmqzpi zmsgapi[]={
     {"new", zmsgnew, 1},
     {"destroy", zmsgdestroy, 1},
@@ -464,6 +518,7 @@ EXPAPI(zclock);
 EXPAPI(zctx);
 EXPAPI(zfile);
 EXPAPI(zframe);
+EXPAPI(zloop);
 EXPAPI(zmsg);
 EXPAPI(zsocket);
 EXPAPI(zsockopt);
