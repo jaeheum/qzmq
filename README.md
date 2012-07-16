@@ -4,7 +4,7 @@
 
 qzmq provides [Q][q] bindings for [CZMQ][czmq], the high-level C binding for [ØMQ][zeromq].
 
-This is version 20120618 of qzmq.
+This is version 20120715 of qzmq.
 
 qzmq is written and maintained by Jaeheum Han.
 
@@ -18,12 +18,12 @@ qzmq is hosted at [github][qzmq] and it uses the [issue tracker][issues] for all
 &emsp;<a href="#toc2-39">Building qzmq</a>
 &emsp;<a href="#toc2-49">How to use qzmq</a>
 &emsp;<a href="#toc2-54">Issues</a>
-&emsp;<a href="#toc2-67"></a>
+&emsp;<a href="#toc2-58"></a>
 
 <A name="toc2-18" title="License" />
 ## License
 
-Current version 20120618 of qzmq is licensed under GPL. Different licenses may become possible in the future.
+Current version 20120715 of qzmq is licensed under GPL. Different licenses may become possible in the future.
 
 Copyright (c) 2012 Jaeheum Han
 
@@ -45,7 +45,7 @@ qzmq is free software: you can redistribute it and/or modify it under the terms 
 ## Building qzmq
 Prerequisites: [ØMQ][zeromq] 2.2, [CZMQ][czmq] (git head) and kdb+ 2.8 `k.h` and `c.o`.
 
-Current version 20120618 of qzmq has been built with 32-bit kdb+ on Mac or "m32", ØMQ 2.2 and CZMQ built from git head:
+Current version 20120715 of qzmq has been built with 32-bit kdb+ on Mac or "m32", ØMQ 2.2 and CZMQ built from git head:
 
     gcc -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so -Wall -Wextra -m32 -I$HOME/include -I/usr/local/include/ -L$HOME/q/m32 -L/usr/local/lib -L$HOME/lib -lzmq -lczmq
 
@@ -58,21 +58,12 @@ C.f. [kdb+ documentation][kdbdoc] for more details.
 
 <A name="toc2-54" title="Issues" />
 ## Issues
-This version 20120618 is buggy.
-
-- Documentation is not ready. qzmq follows CZMQ API closely -- too closely in some ways, for example, returning -1 for error and 0 for success.
-- qzmq API will change in the near future to be more high-level than C-style.
-- qzmq needs a more sensible build/integration mechanism to cover different platforms/versions of kdb+, ØMQ and CZMQ. Current qzmq version is named by date: 20120618, but future versions may follow a different naming convention.
-- Translation of [ØMQ Guide][zguide] is on its way.
-- qzmq does not include zhash and zlist because q has dictionary and list.
-- qzmq does not include zloop currently. Need to determine if it is necessary. 
-
-This list will move to the [issue tracker][issues].
-<A name="toc2-67" title="" />
+See the [issue tracker][issues].
+<A name="toc2-58" title="" />
 
 ---
 
-`qzmq.txt` is written in [Gitdown][gitdown].
+`README.txt` is written in [Gitdown][gitdown].
 
 [qzmq]: https://github.com/jaeheum/qzmq
 [zeromq]: http://www.zeromq.org

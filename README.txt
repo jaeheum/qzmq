@@ -47,20 +47,11 @@ C.f. [kdb+ documentation][kdbdoc] for more details.
     \l qzmq.q / see qzmq_test.q to see usages.
 
 ## Issues
-This version &date() is buggy.
-
-- Documentation is not ready. qzmq follows CZMQ API closely -- too closely in some ways, for example, returning -1 for error and 0 for success.
-- qzmq API will change in the near future to be more high-level than C-style.
-- qzmq needs a more sensible build/integration mechanism to cover different platforms/versions of kdb+, ØMQ and CZMQ. Current qzmq version is named by date: &date(), but future versions may follow a different naming convention.
-- Translation of [ØMQ Guide][zguide] is on its way.
-- qzmq does not include zhash and zlist because q has dictionary and list.
-- qzmq does not include zloop currently. Need to determine if it is necessary. 
-
-This list will move to the [issue tracker][issues].
+See the [issue tracker][issues].
 
 ---
 
-`qzmq.txt` is written in [Gitdown][gitdown].
+`README.txt` is written in [Gitdown][gitdown].
 
 .- Reference
 .-
