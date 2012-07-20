@@ -316,6 +316,7 @@ Z K3(zthreadfork){
 
 // libzmq
 Z K1(version){x=(K)0; K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
+Z K3(device){R ki(zmq_device(xi, VSK(y), VSK(z)));}
 
 typedef struct {S k; V* f; I n;} czmqzpi;
 Z czmqzpi zclockapi[]={
@@ -507,6 +508,7 @@ Z czmqzpi zthreadapi[] = {
 };
 Z czmqzpi libzmqapi[] = {
     {"version", version, 1},
+    {"device", device, 3},
 };
 
 #define APITAB(k,f,n) xS[i]=ss(k);kK(y)[i]=dl(f,n)
@@ -576,6 +578,9 @@ Z struct {S k; I v;} zmqopt[] = {
     {"ZFRAME_DONTWAIT", ZFRAME_DONTWAIT},
     {"ZSOCKET_DYNFROM", ZSOCKET_DYNFROM},
     {"ZSOCKET_DYNTO", ZSOCKET_DYNTO},
+    {"QUEUE", ZMQ_QUEUE},
+    {"FORWARDER", ZMQ_FORWARDER},
+    {"STREAMER", ZMQ_STREAMER},
 };
 #define OPTTAB(k,v) xS[i]=ss(k);kK(y)[i]=ki(v)
 
