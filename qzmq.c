@@ -45,6 +45,9 @@
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
 #define CSTR(x) S s;if(x->n!=1){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;}
+#define TC(x,T) P(x->t!=T, krr("type"))
+#define TC2(x,T,T2) P(x->t!=T&&x->t!=T2, krr("type"))
+#define PC(x) TC(x,-KJ)
 
 ZI N(K x){if(xt>0)R xn;R 1;}
 Z K qstr(S s){R s!=NULL?kp(s):(K)0;}
@@ -55,42 +58,42 @@ static K detachedfn;
 ZV setattachedfn(K x){r1(x);attachedfn=x;}
 ZV setdetachedfn(K x){r1(x);detachedfn=x;}
 
-Z K1(zclocksleep){zclock_sleep(xi); R(K)0;}
+Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
 Z K1(zclocktime){x=(K)0;R(kj(zclock_time()));}
-Z K1(zclocklog){CSTR(x); zclock_log(s); R(K)0;}
+Z K1(zclocklog){TC(x,KC); CSTR(x); zclock_log(s); R(K)0;}
 Z K1(zclocktest){R ki(zclock_test(xg));}
 
 Z K1(zctxnew){x=(K)0; zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
-Z K1(zctxdestroy){ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
-Z K2(zctxsetiothreads){zctx_set_iothreads(VSK(x), yi); R(K)0;}
-Z K2(zctxsetlinger){zctx_set_linger(VSK(x), yi); R(K)0;}
-Z K2(zctxsethwm){zctx_set_hwm(VSK(x), yi); R(K)0;}
-Z K1(zctxgethwm){R ki(zctx_hwm(VSK(x)));}
+Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
+Z K2(zctxsetiothreads){PC(x); TC(y,-KI); zctx_set_iothreads(VSK(x), yi); R(K)0;}
+Z K2(zctxsetlinger){PC(x); TC(y,-KI); zctx_set_linger(VSK(x), yi); R(K)0;}
+Z K2(zctxsethwm){PC(x); TC(y,-KI); zctx_set_hwm(VSK(x), yi); R(K)0;}
+Z K1(zctxgethwm){PC(x); R ki(zctx_hwm(VSK(x)));}
 Z K1(zctxinterrupted){x=(K)0; R kb(zctx_interrupted);}
 Z K1(zctxtest){R ki(zctx_test(xg));}
 
 // zfile `:path
-Z K1(zfiledelete){R ki(zfile_delete(++xs));}
-Z K1(zfilemkdir){R ki(zfile_mkdir(++xs));}
-Z K1(zfileexists){R ki(zfile_exists(++xs));}
-Z K1(zfilesize){R kj(zfile_size(++xs));}
+Z K1(zfiledelete){TC(x,-KS); R ki(zfile_delete(++xs));}
+Z K1(zfilemkdir){TC(x,-KS); R ki(zfile_mkdir(++xs));}
+Z K1(zfileexists){TC(x,-KS); R ki(zfile_exists(++xs));}
+Z K1(zfilesize){TC(x,-KS); R kj(zfile_size(++xs));}
 Z K1(zfiletest){R ki(zfile_test(xg));}
 
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
     if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, ptr(f)); R(K)0;}
     else{zframe_t*f=zframe_new(&xg, 1); P(f, ptr(f)); R(K)0;}}
-Z K1(zframedestroy){ZTK(zframe_t,f); zframe_destroy(&f); R(K)0;}
-Z K1(zframerecv){zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
-Z K1(zframerecvnowait){zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
-Z K3(zframesend){ZTK(zframe_t,f); R ki(zframe_send(&f, VSK(y), zi));}
-Z K1(zframesize){R kj(zframe_size(VSK(x)));}
+Z K1(zframedestroy){PC(x); ZTK(zframe_t,f); zframe_destroy(&f); R(K)0;}
+Z K1(zframerecv){PC(x); zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
+Z K1(zframerecvnowait){PC(x); zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
+Z K3(zframesend){PC(x); PC(y); TC(z,-KI);  ZTK(zframe_t,f); R ki(zframe_send(&f, VSK(y), zi));}
+Z K1(zframesize){PC(x); R kj(zframe_size(VSK(x)));}
 // zframe_data() is unsafe, too low-level for q.
-Z K1(zframedup){R ptr(zframe_dup(VSK(x)));}
-//Z K1(zframestrhex){R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
-Z K1(zframestrdup){I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
-Z K1(zframemore){R ki(zframe_more(VSK(x)));}
-Z K2(zframeeq){R kb(zframe_eq(VSK(x), VSK(y)));}
-Z K2(zframestreq){CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
+Z K1(zframedup){PC(x); R ptr(zframe_dup(VSK(x)));}
+//Z K1(zframestrhex){PC(x); R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
+Z K1(zframestrdup){PC(x); I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
+Z K1(zframemore){PC(x); R ki(zframe_more(VSK(x)));}
+Z K2(zframeeq){PC(x); PC(y); R kb(zframe_eq(VSK(x), VSK(y)));}
+Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
 Z K2(zframeprint){CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
@@ -100,7 +103,7 @@ static K timerfn;
 ZV seteventfn(K x){r1(x);eventfn=x;}
 ZV settimerfn(K x){r1(x);timerfn=x;}
 Z K1(zloopnew){x=(K)0; zloop_t*l=zloop_new(); P(l, ptr(l)); R(K)0;}
-Z K1(zloopdestroy){ZTK(zloop_t,l); zloop_destroy(&l); R(K)0;}
+Z K1(zloopdestroy){PC(x); ZTK(zloop_t,l); zloop_destroy(&l); R(K)0;}
 //typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 ZI event_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
   K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=ptr(item); kK(w)[2]=ptr(args);
@@ -116,169 +119,170 @@ ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
   if(xt==-128){O("k() error: %s\n", xs);}
   R xi;}
 //    zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
-Z K4(zlooppoller){
+Z K4(zlooppoller){PC(x); TC(y,0); TC(z,-KS);
     ZTK(zloop_t, loop);
     seteventfn(z);
-    if(yt==0){zmq_pollitem_t item={VSK(yK[0]), yK[1]->i, yK[2]->h,yK[3]->h};
+    zmq_pollitem_t item={VSK(yK[0]), yK[1]->i, yK[2]->h,yK[3]->h};
     R ki(zloop_poller(loop, &item, event_loop_fn, z4));}
-    else{O("incorrect polling items"); R ki(-1);}}
-Z K2(zlooppollerend){zloop_poller_end(VSK(x), VSK(y)); R(K)0;}
+Z K2(zlooppollerend){PC(x); PC(y); zloop_poller_end(VSK(x), VSK(y)); R(K)0;}
 // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
-Z K5(zlooptimer){
+Z K5(zlooptimer){PC(x); TC2(y,-KI,-KJ); TC2(z,-KI,-KJ); TC(z4,-KS); 
     ZTK(zloop_t,loop);
     settimerfn(z4);
     I rc=zloop_timer(loop, yj, zj, timer_loop_fn, z5);
     R ki(rc);}
-Z K2(zlooptimerend){zloop_timer_end(VSK(x), VSK(y)); R(K)0;}
-Z K2(zloopsetverbose){ZTK(zloop_t,loop); zloop_set_verbose(loop, y->g); R(K)0;}
-Z K1(zloopstart){
+Z K2(zlooptimerend){PC(x); PC(y); zloop_timer_end(VSK(x), VSK(y)); R(K)0;}
+Z K2(zloopsetverbose){PC(x); TC(y,-KB); ZTK(zloop_t,loop); zloop_set_verbose(loop, y->g); R(K)0;}
+Z K1(zloopstart){PC(x);
     ZTK(zloop_t,loop);  
     I rc=zloop_start(loop);
     R ki(rc);}
 Z K1(zlooptest){R ki(zloop_test(xg));}
 
 Z K1(zmsgnew){x=(K)0; zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
-Z K1(zmsgdestroy){ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
-Z K1(zmsgrecv){R ptr(zmsg_recv(VSK(x)));}
-Z K2(zmsgsend){ZTK(zmsg_t,m); zmsg_send(&m, VSK(y)); R(K)0;}
-Z K1(zmsgsize){R kj(zmsg_size(VSK(x)));}
-Z K1(zmsgcontentsize){R kj(zmsg_content_size(VSK(x)));}
-Z K2(zmsgpush){zmsg_push(VSK(x), VSK(y)); R(K)0;}
-Z K1(zmsgpop){P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
-Z K2(zmsgadd){zmsg_add(VSK(x), VSK(y)); R(K)0;}
+Z K1(zmsgdestroy){PC(x); ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
+Z K1(zmsgrecv){PC(x); R ptr(zmsg_recv(VSK(x)));}
+Z K2(zmsgsend){PC(x); PC(y); ZTK(zmsg_t,m); zmsg_send(&m, VSK(y)); R(K)0;}
+Z K1(zmsgsize){PC(x); R kj(zmsg_size(VSK(x)));}
+Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
+Z K2(zmsgpush){PC(x); PC(y); zmsg_push(VSK(x), VSK(y)); R(K)0;}
+Z K1(zmsgpop){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
+Z K2(zmsgadd){PC(x); PC(y); zmsg_add(VSK(x), VSK(y)); R(K)0;}
 //Z K3(zmsgpushmem){zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
 //Z K3(zmsgaddmem){zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
 //Z K2(zmsgpushstr){CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
 //Z K2(zmsgaddstr){CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
 //Z K1(zmsgpopstr){R kp(zmsg_popstr(VSK(x)));}
-Z K2(zmsgwrap){zmsg_wrap(VSK(x), VSK(y));R(K)0;}
-Z K1(zmsgunwrap){R ptr(zmsg_unwrap(VSK(x)));}
-Z K2(zmsgremove){zmsg_remove(VSK(x), VSK(y)); R(K)0;}
-Z K1(zmsgfirst){P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
-Z K1(zmsgnext){P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
-Z K1(zmsglast){P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
-Z K2(zmsgsave){FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
-Z K2(zmsgload){FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
+Z K2(zmsgwrap){PC(x); PC(y); zmsg_wrap(VSK(x), VSK(y));R(K)0;}
+Z K1(zmsgunwrap){PC(x); R ptr(zmsg_unwrap(VSK(x)));}
+Z K2(zmsgremove){PC(x); PC(y); zmsg_remove(VSK(x), VSK(y)); R(K)0;}
+Z K1(zmsgfirst){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
+Z K1(zmsgnext){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
+Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
+Z K2(zmsgsave){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
+Z K2(zmsgload){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 //TODO(hjh): use kdb for saving/loading
 //Z K2(zmsgencode){R kj(zmsg_encode(VSK(x), VSK(y)));}
 //Z K2(zmsgdecode){R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
-Z K1(zmsgdup){zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
-Z K1(zmsgdump){zmsg_dump(VSK(x)); R(K)0;}
+Z K1(zmsgdup){PC(x); zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
+Z K1(zmsgdump){PC(x); zmsg_dump(VSK(x)); R(K)0;}
 Z K1(zmsgtest){R ki(zmsg_test(xg));}
 
-Z K2(zsocketnew){R ptr(zsocket_new(VSK(x), yi));}
-Z K2(zsocketdestroy){zsocket_destroy(VSK(x), VSK(y)); R(K)0;}
-Z K2(zsocketbind){R ki(zsocket_bind(VSK(x), ys));}
-Z K2(zsocketconnect){zsocket_connect(VSK(x), ys); R(K)0;}
-Z K1(zsockettypestr){R ks(zsocket_type_str(VSK(x)));}
+Z K2(zsocketnew){PC(x); TC(y,-KI); R ptr(zsocket_new(VSK(x), yi));}
+Z K2(zsocketdestroy){PC(x); PC(y); zsocket_destroy(VSK(x), VSK(y)); R(K)0;}
+Z K2(zsocketbind){PC(x); TC(y,-KS); R ki(zsocket_bind(VSK(x), ys));}
+Z K2(zsocketconnect){PC(x); TC(y,-KS); zsocket_connect(VSK(x), ys); R(K)0;}
+Z K1(zsockettypestr){PC(x); R ks(zsocket_type_str(VSK(x)));}
 
 #if (ZMQ_VERSION_MAJOR == 2)
-Z K1(zsockethwm){R ki(zsocket_hwm(VSK(x)));}
-Z K1(zsocketswap){R ki(zsocket_swap(VSK(x)));}
-Z K1(zsocketaffinity){R ki(zsocket_affinity(VSK(x)));}
-Z K1(zsocketidentity){size_t n=255; S s=(S)malloc(n);  I r; K id;
+Z K1(zsockethwm){PC(x); R ki(zsocket_hwm(VSK(x)));}
+Z K1(zsocketswap){PC(x); R ki(zsocket_swap(VSK(x)));}
+Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
+Z K1(zsocketidentity){PC(x);
+    size_t n=255; S s=(S)malloc(n);  I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
         else{R krr("malloc");}} 
-Z K1(zsocketrate){R ki(zsocket_rate(VSK(x)));}
-Z K1(zsocketrecovery_ivl){R ki(zsocket_recovery_ivl(VSK(x)));}
-Z K1(zsocketrecovery_ivl_msec){R ki(zsocket_recovery_ivl_msec(VSK(x)));}
-Z K1(zsocketmcast_loop){R ki(zsocket_mcast_loop(VSK(x)));}
+Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
+Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
+Z K1(zsocketrecovery_ivl_msec){PC(x); R ki(zsocket_recovery_ivl_msec(VSK(x)));}
+Z K1(zsocketmcast_loop){PC(x); R ki(zsocket_mcast_loop(VSK(x)));}
 #if (ZMQ_VERSION_MINOR == 2)
-Z K1(zsocketrcvtimeo){R ki(zsocket_rcvtimeo(VSK(x)));}
+Z K1(zsocketrcvtimeo){PC(x); R ki(zsocket_rcvtimeo(VSK(x)));}
 #endif
 #if (ZMQ_VERSION_MINOR == 2)
-Z K1(zsocketsndtimeo){R ki(zsocket_sndtimeo(VSK(x)));}
+Z K1(zsocketsndtimeo){PC(x); R ki(zsocket_sndtimeo(VSK(x)));}
 #endif
-Z K1(zsocketsndbuf){R ki(zsocket_sndbuf(VSK(x)));}
-Z K1(zsocketrcvbuf){R ki(zsocket_sndbuf(VSK(x)));}
-Z K1(zsocketlinger){R ki(zsocket_linger(VSK(x)));}
-Z K1(zsocketreconnect_ivl){R ki(zsocket_reconnect_ivl(VSK(x)));}
-Z K1(zsocketreconnect_ivl_max){R ki(zsocket_reconnect_ivl_max(VSK(x)));}
-Z K1(zsocketbacklog){R ki(zsocket_backlog(VSK(x)));}
-Z K1(zsockettype){R ki(zsocket_type(VSK(x)));}
-Z K1(zsocketrcvmore){R ki(zsocket_rcvmore(VSK(x)));}
-Z K1(zsocketfd){R ki(zsocket_fd(VSK(x)));}
-Z K1(zsocketevents){R ki(zsocket_events(VSK(x)));}
-Z K2(zsocketsethwm){zsocket_set_hwm(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetswap){zsocket_set_swap(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetaffinity){zsocket_set_affinity(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetidentity){CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
-Z K2(zsocketsetrate){zsocket_set_rate(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrecovery_ivl){zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrecovery_ivl_msec){zsocket_set_recovery_ivl_msec(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetmcast_loop){zsocket_set_mcast_loop(VSK(x), yi); R(K)0;}
+Z K1(zsocketsndbuf){PC(x); R ki(zsocket_sndbuf(VSK(x)));}
+Z K1(zsocketrcvbuf){PC(x); R ki(zsocket_sndbuf(VSK(x)));}
+Z K1(zsocketlinger){PC(x); R ki(zsocket_linger(VSK(x)));}
+Z K1(zsocketreconnect_ivl){PC(x); R ki(zsocket_reconnect_ivl(VSK(x)));}
+Z K1(zsocketreconnect_ivl_max){PC(x); R ki(zsocket_reconnect_ivl_max(VSK(x)));}
+Z K1(zsocketbacklog){PC(x); R ki(zsocket_backlog(VSK(x)));}
+Z K1(zsockettype){PC(x); R ki(zsocket_type(VSK(x)));}
+Z K1(zsocketrcvmore){PC(x); R ki(zsocket_rcvmore(VSK(x)));}
+Z K1(zsocketfd){PC(x); R ki(zsocket_fd(VSK(x)));}
+Z K1(zsocketevents){PC(x); R ki(zsocket_events(VSK(x)));}
+Z K2(zsocketsethwm){PC(x); TC(y,-KI); zsocket_set_hwm(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetswap){PC(x); TC(y,-KI); zsocket_set_swap(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetaffinity){PC(x); TC(y,-KI); zsocket_set_affinity(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetidentity){PC(x); TC2(y,KC,-KC); CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
+Z K2(zsocketsetrate){PC(x); TC(y,-KI); zsocket_set_rate(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrecovery_ivl){PC(x); TC(y,-KI); zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrecovery_ivl_msec){PC(x); TC(y,-KI); zsocket_set_recovery_ivl_msec(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetmcast_loop){PC(x); TC(y,-KI); zsocket_set_mcast_loop(VSK(x), yi); R(K)0;}
 #if (ZMQ_VERSION_MINOR == 2)
-Z K2(zsocketsetrcvtimeo){zsocket_set_rcvtimeo(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrcvtimeo){PC(x); TC(y,-KI); zsocket_set_rcvtimeo(VSK(x), yi); R(K)0;}
 #endif
 #if (ZMQ_VERSION_MINOR == 2)
-Z K2(zsocketsetsndtimeo){zsocket_set_sndtimeo(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetsndtimeo){PC(x); TC(y,-KI); zsocket_set_sndtimeo(VSK(x), yi); R(K)0;}
 #endif
-Z K2(zsocketsetsndbuf){zsocket_set_sndbuf(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrcvbuf){zsocket_set_rcvbuf(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetlinger){zsocket_set_linger(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetreconnect_ivl){zsocket_set_reconnect_ivl(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetreconnect_ivl_max){zsocket_set_reconnect_ivl_max(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetbacklog){zsocket_set_backlog(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetsubscribe){zsocket_set_subscribe(VSK(x), ys); R(K)0;}
-Z K2(zsocketsetunsubscribe){zsocket_set_unsubscribe(VSK(x), ys); R(K)0;}
+Z K2(zsocketsetsndbuf){PC(x); TC(y,-KI); zsocket_set_sndbuf(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrcvbuf){PC(x); TC(y,-KI); zsocket_set_rcvbuf(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetlinger){PC(x); TC(y,-KI); zsocket_set_linger(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetreconnect_ivl){PC(x); TC(y,-KI); zsocket_set_reconnect_ivl(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetreconnect_ivl_max){PC(x); TC(y,-KI); zsocket_set_reconnect_ivl_max(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetbacklog){PC(x); TC(y,-KI); zsocket_set_backlog(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetsubscribe){PC(x); TC(y,-KS); zsocket_set_subscribe(VSK(x), ys); R(K)0;}
+Z K2(zsocketsetunsubscribe){PC(x); TC(y,-KS); zsocket_set_unsubscribe(VSK(x), ys); R(K)0;}
 #endif
 #if (ZMQ_VERSION_MAJOR == 3)
-Z K1(zsockettype){R ki(zsocket_type(VSK(x)));}
-Z K1(zsocketsndhwm){R ki(zsocket_sndhwm(VSK(x)));}
-Z K1(zsocketrcvhwm){R ki(zsocket_rcvhwm(VSK(x)));}
-Z K1(zsocketaffinity){R ki(zsocket_affinity(VSK(x)));}
-Z K1(zsocketidentity){size_t n=255; S s=(S)malloc(n);  I r; K id;
+Z K1(zsockettype){PC(x); R ki(zsocket_type(VSK(x)));}
+Z K1(zsocketsndhwm){PC(x); R ki(zsocket_sndhwm(VSK(x)));}
+Z K1(zsocketrcvhwm){PC(x); R ki(zsocket_rcvhwm(VSK(x)));}
+Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
+Z K1(zsocketidentity){PC(x);
+    size_t n=255; S s=(S)malloc(n);  I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
         else{R krr("malloc");}} 
-Z K1(zsocketrate){R ki(zsocket_rate(VSK(x)));}
-Z K1(zsocketrecovery_ivl){R ki(zsocket_recovery_ivl(VSK(x)));}
-Z K1(zsocketsndbuf){R ki(zsocket_sndbuf(VSK(x)));}
-Z K1(zsocketrcvbuf){R ki(zsocket_rcvbuf(VSK(x)));}
-Z K1(zsocketlinger){R ki(zsocket_linger(VSK(x)));}
-Z K1(zsocketreconnect_ivl){R ki(zsocket_reconnect_ivl(VSK(x)));}
-Z K1(zsocketreconnect_ivl_max){R ki(zsocket_reconnect_ivl_max(VSK(x)));}
-Z K1(zsocketbacklog){R ki(zsocket_backlog(VSK(x)));}
-Z K1(zsocketmaxmsgsize){R ki(zsocket_maxmsgsize(VSK(x)));}
-Z K1(zsocketipv4only){R ki(zsocket_ipv4only(VSK(x)));}
-Z K1(zsocketrcvmore){R ki(zsocket_rcvmore(VSK(x)));}
-Z K1(zsocketfd){R ki(zsocket_fd(VSK(x)));}
-Z K1(zsocket_events){R ki(zsocket_events(VSK(x)));}
-Z K1(zsocket_last_endpoint){R ks(zsocket_last_endpoint(VSK(x)));}
-Z K2(zsocketsetsndhwm){zsocket_set_sndhwm(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrcvhwm){zsocket_set_rcvhwm(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetaffinity){zsocket_set_affinity(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetsubscribe){zsocket_set_subscribe(VSK(x), ys); R(K)0;}
-Z K2(zsocketsetunsubscribe){zsocket_set_unsubscribe(VSK(x), ys); R(K)0;}
-Z K2(zsocketsetidentity){CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
-Z K2(zsocketsetrate){zsocket_set_rate(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrecovery_ivl){zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetsndbuf){zsocket_set_sndbuf(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrcvbuf){zsocket_set_rcvbuf(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetlinger){zsocket_set_linger(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetreconnect_ivl){zsocket_set_reconnect_ivl(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetreconnect_ivl_max){zsocket_set_reconnect_ivl_max(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetmulticast_hops){zsocket_set_multicast_hops(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetbacklog){zsocket_set_backlog(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetmaxmsgsize){zsocket_set_maxmsgsize(VSK(x), yi); R(K)0;}
-Z K2(zsocketmulticast_hops){zsocket_multicast_hops(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetrcvtimeo){zsocket_set_rcvtimeo(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetsndtimeo){zsocket_set_sndtimeo(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetipv4only){zsocket_set_ipv4only(VSK(x), yi); R(K)0;}
-Z K2(zsocketsetfailunroutable){zsocket_set_fail_unroutable(VSK(x), yi); R(K)0;}
-Z K2(zsocketsethwm){zsocket_set_hwm(VSK(x), yi); R(K)0;}
+Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
+Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
+Z K1(zsocketsndbuf){PC(x); R ki(zsocket_sndbuf(VSK(x)));}
+Z K1(zsocketrcvbuf){PC(x); R ki(zsocket_rcvbuf(VSK(x)));}
+Z K1(zsocketlinger){PC(x); R ki(zsocket_linger(VSK(x)));}
+Z K1(zsocketreconnect_ivl){PC(x); R ki(zsocket_reconnect_ivl(VSK(x)));}
+Z K1(zsocketreconnect_ivl_max){PC(x); R ki(zsocket_reconnect_ivl_max(VSK(x)));}
+Z K1(zsocketbacklog){PC(x); R ki(zsocket_backlog(VSK(x)));}
+Z K1(zsocketmaxmsgsize){PC(x); R ki(zsocket_maxmsgsize(VSK(x)));}
+Z K1(zsocketipv4only){PC(x); R ki(zsocket_ipv4only(VSK(x)));}
+Z K1(zsocketrcvmore){PC(x); R ki(zsocket_rcvmore(VSK(x)));}
+Z K1(zsocketfd){PC(x); R ki(zsocket_fd(VSK(x)));}
+Z K1(zsocket_events){PC(x); R ki(zsocket_events(VSK(x)));}
+Z K1(zsocket_last_endpoint){PC(x); R ks(zsocket_last_endpoint(VSK(x)));}
+Z K2(zsocketsetsndhwm){PC(x); TC(y,-KI); zsocket_set_sndhwm(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrcvhwm){PC(x); TC(y,-KI); zsocket_set_rcvhwm(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetaffinity){PC(x); TC(y,-KI); zsocket_set_affinity(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetsubscribe){PC(x); TC(y,-KS); zsocket_set_subscribe(VSK(x), ys); R(K)0;}
+Z K2(zsocketsetunsubscribe){PC(x); TC(y,-KS); zsocket_set_unsubscribe(VSK(x), ys); R(K)0;}
+Z K2(zsocketsetidentity){PC(x); TC2(y,KC,-KC); CSTR(y); CRE(zmq_setsockopt(VSK(x), ZMQ_IDENTITY, s, N(y))); R(K)0;}
+Z K2(zsocketsetrate){PC(x); TC(y,-KI); zsocket_set_rate(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrecovery_ivl){PC(x); TC(y,-KI); zsocket_set_recovery_ivl(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetsndbuf){PC(x); TC(y,-KI); zsocket_set_sndbuf(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrcvbuf){PC(x); TC(y,-KI); zsocket_set_rcvbuf(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetlinger){PC(x); TC(y,-KI); zsocket_set_linger(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetreconnect_ivl){PC(x); TC(y,-KI); zsocket_set_reconnect_ivl(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetreconnect_ivl_max){PC(x); TC(y,-KI); zsocket_set_reconnect_ivl_max(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetmulticast_hops){PC(x); TC(y,-KI); zsocket_set_multicast_hops(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetbacklog){PC(x); TC(y,-KI); zsocket_set_backlog(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetmaxmsgsize){PC(x); TC(y,-KI); zsocket_set_maxmsgsize(VSK(x), yi); R(K)0;}
+Z K2(zsocketmulticast_hops){PC(x); TC(y,-KI); zsocket_multicast_hops(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetrcvtimeo){PC(x); TC(y,-KI); zsocket_set_rcvtimeo(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetsndtimeo){PC(x); TC(y,-KI); zsocket_set_sndtimeo(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetipv4only){PC(x); TC(y,-KI); zsocket_set_ipv4only(VSK(x), yi); R(K)0;}
+Z K2(zsocketsetfailunroutable){PC(x); TC(y,-KI); zsocket_set_fail_unroutable(VSK(x), yi); R(K)0;}
+Z K2(zsocketsethwm){PC(x); TC(y,-KI); zsocket_set_hwm(VSK(x), yi); R(K)0;}
 #endif
 Z K1(zsockopttest){R ki(zsockopt_test(xg));}
 
 // send/receive q char vector (not for byte vectors or serialized objects)
 // zstr_recv* returns C string with a trailing \0. Convert it to q char vector and free the poor thing.
-Z K1(zstrrecv){S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
-Z K1(zstrrecvnowait){S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
-Z K2(zstrsend){r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
-Z K2(zstrsendm){r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
+Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
+Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
+Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
+Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
 // zero-copy or zmq_msg_init_data() takes over the ownership of kC(y) or yG buffer (but we don't let it write/free yG).
-Z K2(zstrsend0){r1(y); zmq_msg_t msg; // keep y in place at least (q main thread owns y)
+Z K2(zstrsend0){PC(x); TC2(y,KC,-KC); r1(y); zmq_msg_t msg; // keep y in place at least (q main thread owns y)
     if(yt>0){zmq_msg_init_data(&msg, (S)kC(y), yn, NULL, NULL);}
     else{zmq_msg_init_data(&msg, &yg, 1, NULL, NULL);}
     I rc=zmq_sendmsg (VSK(x), &msg, 0);
@@ -293,7 +297,7 @@ ZV*df(V*args){
     if(xt==-128){O("k() error: %s\n", xs);}
     r0(x); m9(); R NULL;}
 // zthread_new(zthread_detached_fn *thread_fn, void* args);
-Z K2(zthreadnew){
+Z K2(zthreadnew){TC(x,-KS);
     r1(x);
     setdetachedfn(x);
     I rc=zthread_new(df, r1(y));
@@ -307,7 +311,7 @@ ZV af(V*args, zctx_t*ctx, V*pipe){
     r0(x); m9();}
 // void* zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
 // From q: zthreadfork[ctx; `qaf; args;]
-Z K3(zthreadfork){
+Z K3(zthreadfork){PC(x); TC(y,-KS); 
     r1(y);
     setattachedfn(y);
     V*pipe=zthread_fork(VSK(r1(x)), af, r1(z));
@@ -316,7 +320,7 @@ Z K3(zthreadfork){
 
 // libzmq
 Z K1(version){x=(K)0; K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
-Z K3(device){R ki(zmq_device(xi, VSK(y), VSK(z)));}
+Z K3(device){TC(x,-KI); PC(y); PC(z); R ki(zmq_device(xi, VSK(y), VSK(z)));}
 
 typedef struct {S k; V* f; I n;} czmqzpi;
 Z czmqzpi zclockapi[]={
