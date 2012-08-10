@@ -35,7 +35,7 @@ Many other [languages][languages] are available.
 ## Running Clients/Servers In Different Languages
 
 <center>
-<img src="https://github.com/jaeheum/qzmq/raw/master/images/README_1.png" alt="1">
+<img src="https://raw.github.com/jaeheum/qzmq/master/demos/images/README_1.png" alt="1">
 </center>
 
 Let's set up two pairs of client/server. First pair made up with a q client (`req.q`)
