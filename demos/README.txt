@@ -8,19 +8,9 @@ This article outlines a few simple demonstrations of cross-language distributed 
 
 .toc 1
 
-## Languages Supports for ZeroMQ
+## Installation
 
-For q, see [qzmq][qzmq].
-
-For perl, install [ZeroMQ.pm][perl] from CPAN:
-
-    sudo cpan -i ZeroMQ # add -f flag if necessary
-
-For python, install [pyzmq][pyzmq]:
-
-    sudo easy_install pyzmq
-
-Many other [languages][languages] are available.
+See [installation.md][installation] for installing both ZeroMQ and language bindings.
 
 ## Running Clients/Servers In Different Languages
 
@@ -28,7 +18,7 @@ Many other [languages][languages] are available.
  lang:bash                             lang:q                                    lang:python
 +----------+                          +--------------+                          +-------------+
 | {io}     |                          | {io}         |                          | {io}        |
-| zmq_push | 'psy oppa gangnam style' | req.q        |                          | req.py      |
+| zmq_push | 'psy oppa gangnam style' | req.q        |                          | rep.py      |
 |(ZMQ_PUSH)|------------------------->|(ZMQ_PULL)    |                          |             |
 |          |                          |              | 'psy oppa gangnam style' |             |
 |          |                          |     (ZMQ_REQ)|------------------------->|             |  
@@ -43,7 +33,7 @@ Many other [languages][languages] are available.
 Let's set up two pairs of client/server. First pair made up with a q client (`req.q`)
 and python server (`rep.py`). Launch these two in q and python in two separate terminals:
 
-    $ q req.q -q # terminal 1
+    $ q req.q -q # terminal 1, substitute with 'python req.py' if either q or qzmq is not installed.
     $ python rep.py # terminal 2
 
 From terminal 3, start pushing text message data 
@@ -56,7 +46,7 @@ From terminal 3, start pushing text message data
 
 This shell function acts as a client to q "server" `req.q`, that receives the message and requests SHA1 of the message from `rep.py` in Python:
 
-    $ q req.q -q
+    $ q req.q -q # or 'python req.py'
     12-08-09 23:25:29 q received: 'psy oppa gangnam style'
     12-08-09 23:25:29 q (pid=5553) received sha1 from perl or python: 7c4db1c7db942d98a6f885efd4de173acd3c789f
     ...
@@ -101,7 +91,7 @@ For a simple demonstration of multiple clients and multiple servers, we use
 
 Start the message queue:
 
-    $ q msgqueue.q -q
+    $ q msgqueue.q -q # or 'python msgqueue.py' or 'perl msgqueue.pl'
     
 Start the servers:
 
@@ -112,8 +102,8 @@ Start the servers:
 
 Start the clients:
 
-    $ q mreq.q -q
-    $ q mreq.q -q
+    $ q mreq.q -q # 'python mreq.py' or ..
+    $ q mreq.q -q # 'perl mreq.pl' (may need to install `cpan -f -i String::Random`)
     $ q mreq.q -q
     ...
 
@@ -156,6 +146,8 @@ Copyright (c) 2012 Jaeheum Han
 * GNU Affero General Public License v.3.
 * Non-AGPL TBD
 
+Note that `msgqueue.py` and `msgqueue.pl` are copyright (c) 2010-2011 iMatix Corporation and Contributors. Their license is [ZeroMQ Guide examples license][zguide-license].
+
 ---
 
 Cross-language distributed systems have nothing to do with [Psy's Gangnam Style][gangnam].
@@ -168,6 +160,7 @@ Cross-language distributed systems have nothing to do with [Psy's Gangnam Style]
 [czmq]: http://czmq.zeromq.org
 [q]: http://kx.com
 [zguide]: http://zguide.zeromq.org
+[zguide-license]: https://github.com/imatix/zguide/blob/master/examples/LICENSE
 [gitdown]: https://github.com/imatix/gitdown
 [broker]: http://zguide.zeromq.org/page:all#A-Request-Reply-Broker
 [brokerless]: http://www.zeromq.org/whitepapers:brokerless
@@ -176,3 +169,4 @@ Cross-language distributed systems have nothing to do with [Psy's Gangnam Style]
 [pyzmq]: http://www.zeromq.org/bindings:python
 [languages]: http://www.zeromq.org/bindings:_start
 [gangnam]: http://www.youtube.com/watch?v=9bZkp7q19f0&feature=related
+[installation]: $(GIT)/blob/master/demos/installation.md
