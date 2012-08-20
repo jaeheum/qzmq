@@ -171,4 +171,5 @@ Cross-language distributed systems have nothing to do with [Psy's Gangnam Style]
 [pyzmq]: http://www.zeromq.org/bindings:python
 [languages]: http://www.zeromq.org/bindings:_start
 [gangnam]: http://www.youtube.com/watch?v=9bZkp7q19f0&feature=related
-[installation]: https://github.com/jaeheum/qzmq/blob/master/demos/installation.m
+[installation]: https://github.com/jaeheum/qzmq/blob/master/demos/installation.md
+
