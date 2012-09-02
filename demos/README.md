@@ -2,19 +2,19 @@
 <A name="toc1-2" title="Cross-Language Distributed System With ZeroMQ and qzmq" />
 # Cross-Language Distributed System With ZeroMQ and qzmq
 
-This article outlines a few simple demonstrations of cross-language distributed systems. Please use the [issue tracker][issues] for all issues and comments. (Last edit date: 20120820)
+This article outlines a few simple demonstrations of cross-language distributed systems. Please use the [issue tracker][issues] for all issues and comments. (Last edit date: 20120901)
 
 <A name="toc2-7" title="Contents" />
 ## Contents
 
 &emsp;<a href="#toc2-12">Installation</a>
 &emsp;<a href="#toc2-17">Running Clients/Servers In Different Languages</a>
-&emsp;<a href="#toc2-70">Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server</a>
-&emsp;<a href="#toc2-86">Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance</a>
-&emsp;<a href="#toc3-131">Load Balancing and Fault Tolerance</a>
-&emsp;<a href="#toc2-141">Further Information</a>
-&emsp;<a href="#toc2-149">License</a>
-&emsp;<a href="#toc2-159"></a>
+&emsp;<a href="#toc2-135">Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server</a>
+&emsp;<a href="#toc2-151">Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance</a>
+&emsp;<a href="#toc3-196">Load Balancing and Fault Tolerance</a>
+&emsp;<a href="#toc2-206">Further Information</a>
+&emsp;<a href="#toc2-214">License</a>
+&emsp;<a href="#toc2-224"></a>
 
 <A name="toc2-12" title="Installation" />
 ## Installation
@@ -60,9 +60,74 @@ Perl can be used Instead of Python with `rep.pl`:
     perl (pid=5646): sending back sha1 of the received data: 7c4db1c7db942d98a6f885efd4de173acd3c789f
     ...
 
-Different ZeroMQ socket types (`ZMQ_PUSH`, `ZMQ_PULL`, `ZMQ_REQ`, `ZMQ_REP` in the Figure 1) are explained in [ZeroMQ Reference](http://api.zeromq.org/2-2:zmq-socket). 
+Different ZeroMQ socket types (`ZMQ_PUSH`, `ZMQ_PULL`, `ZMQ_REQ`, `ZMQ_REP` in the Figure 1) are explained in [ZeroMQ Reference](http://api.zeromq.org/2-2:zmq-socket).
 
-<A name="toc2-70" title="Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server" />
+Here is a transcript of running `zmq_push`, `req.py` and `rep.py` in three terminals:
+
+    $ zmq_push                  
+    Climb ev'ry mountain
+    $ zmq_push
+    Search high and low
+    $ zmq_push
+    Follow ev'ry by-way
+    $ zmq_push
+    Every path you know
+    $ # here change rep.py with rep.pl and redo
+    $ zmq_push 
+    Climb ev'ry mountain
+    $ zmq_push 
+    Search high and low
+    $ zmq_push 
+    Follow ev'ry by-way
+    $ zmq_push 
+    Every path you know
+    $ 
+
+    $ python req.py 
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low'
+    python (pid=16320): received sha1 from perl or python: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way'
+    python (pid=16320): received sha1 from perl or python: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know'
+    python (pid=16320): received sha1 from perl or python: f67665591fad08d1620c65c4c2f345b0b7083577
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low'
+    python (pid=16320): received sha1 from perl or python: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way'
+    python (pid=16320): received sha1 from perl or python: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know'
+    python (pid=16320): received sha1 from perl or python: f67665591fad08d1620c65c4c2f345b0b7083577
+
+    $ python rep.py
+    python: received 'Climb ev'ry mountain' from client.
+    python (pid=16318): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Climb ev'ry mountain' from client.
+    python (pid=16318): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low' from client.
+    python (pid=16318): sending back sha1 of the received data: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way' from client.
+    python (pid=16318): sending back sha1 of the received data: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know' from client.
+    python (pid=16318): sending back sha1 of the received data: f67665591fad08d1620c65c4c2f345b0b7083577
+    ^C # stacktrace
+    KeyboardInterrupt
+    $ perl rep.pl # switch to perl version.
+    perl: received 'Climb ev'ry mountain' from client.
+    perl (pid=16369): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    perl: received 'Search high and low' from client.
+    perl (pid=16369): sending back sha1 of the received data: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    perl: received 'Follow ev'ry by-way' from client.
+    perl (pid=16369): sending back sha1 of the received data: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    perl: received 'Every path you know' from client.
+    perl (pid=16369): sending back sha1 of the received data: f67665591fad08d1620c65c4c2f345b0b7083577
+    
+
+<A name="toc2-135" title="Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server" />
 ## Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server
 
 Launch a single server from a terminal:
@@ -78,7 +143,7 @@ Launch many clients `c.py` in many terminals. `c.py` sends a date/time string ev
     python (pid=7962): received sha1 of data: 97bf5dfb1c76991dbb15054728826422c175e13e
     # ... in other terminals the different pid values of c.py will appear
 
-<A name="toc2-86" title="Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance" />
+<A name="toc2-151" title="Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance" />
 ## Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance
 
 Multiple clients and a single server configuration has at least two problems: the server has a scalability limit and is a single point of failure (SPOF). Running multiple servers to share load is a solution to SPOF and scalability. However this solution needs more elaboration. If the clients need to maintain addresses of the servers, then the clients themselves need to handle load balancing (choosing one server out of many) and fault tolerance (as servers appear/disappear). It is obvious that clients need to coordinate among themselves to devise globally optimal dynamic configuration because otherwise poor utilization will be added to the problem of SPOF and scalability.
@@ -123,7 +188,7 @@ Output from a client pid=10909 shows the client received back what it had sent o
     12-08-10 01:36:37 q (pid=10909) received the original data: pwiertptor (from client pid=10909)
     ... 
 
-<A name="toc3-131" title="Load Balancing and Fault Tolerance" />
+<A name="toc3-196" title="Load Balancing and Fault Tolerance" />
 ### Load Balancing and Fault Tolerance
 
 Try the following:
@@ -133,7 +198,7 @@ Try the following:
 * Start a server, it handles all requests from the clients that come out of their pause.
 * Start more servers and they share the load together. (load balancing)
 
-<A name="toc2-141" title="Further Information" />
+<A name="toc2-206" title="Further Information" />
 ## Further Information
 
 Cross-language distributed system is a large subject and we have already touched on a sensitive topic of "broker" that enables a multiple client to multiple server configuration at a cost of having a [man-in-the-middle][mitm]. For more discussions from ZeroMQ perspectives, start with:
@@ -141,7 +206,7 @@ Cross-language distributed system is a large subject and we have already touched
 * [ZeroMQ Guide][zguide]
 * [Broker vs Brokerless][brokerless]
 
-<A name="toc2-149" title="License" />
+<A name="toc2-214" title="License" />
 ## License
 
 Copyright (c) 2012 Jaeheum Han
@@ -150,7 +215,7 @@ Copyright (c) 2012 Jaeheum Han
 * Non-AGPL TBD
 
 Note that `msgqueue.py` and `msgqueue.pl` are copyright (c) 2010-2011 iMatix Corporation and Contributors. Their license is [ZeroMQ Guide examples license][zguide-license].
-<A name="toc2-159" title="" />
+<A name="toc2-224" title="" />
 
 ---
 

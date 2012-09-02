@@ -1,5 +1,4 @@
 import os
-import sha
 import zmq
 
 ctx = zmq.Context(1)

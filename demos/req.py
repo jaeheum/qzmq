@@ -1,5 +1,5 @@
+import hashlib
 import os
-import sha
 import zmq
 
 ctx = zmq.Context(1)
@@ -12,5 +12,5 @@ while 1:
     data = pull.recv_string()
     print "python: received '%s'" % data
     sock.send_string(data)
-    digest = sha.new(data).hexdigest()
+    digest = sock.recv_string()
     print "python (pid=%s): received sha1 from perl or python: %s" % (os.getpid(), digest)

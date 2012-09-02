@@ -62,7 +62,72 @@ Perl can be used Instead of Python with `rep.pl`:
     perl (pid=5646): sending back sha1 of the received data: 7c4db1c7db942d98a6f885efd4de173acd3c789f
     ...
 
-Different ZeroMQ socket types (`ZMQ_PUSH`, `ZMQ_PULL`, `ZMQ_REQ`, `ZMQ_REP` in the Figure 1) are explained in [ZeroMQ Reference](http://api.zeromq.org/2-2:zmq-socket). 
+Different ZeroMQ socket types (`ZMQ_PUSH`, `ZMQ_PULL`, `ZMQ_REQ`, `ZMQ_REP` in the Figure 1) are explained in [ZeroMQ Reference](http://api.zeromq.org/2-2:zmq-socket).
+
+Here is a transcript of running `zmq_push`, `req.py` and `rep.py` in three terminals:
+
+    $ zmq_push                  
+    Climb ev'ry mountain
+    $ zmq_push
+    Search high and low
+    $ zmq_push
+    Follow ev'ry by-way
+    $ zmq_push
+    Every path you know
+    $ # here change rep.py with rep.pl and redo
+    $ zmq_push 
+    Climb ev'ry mountain
+    $ zmq_push 
+    Search high and low
+    $ zmq_push 
+    Follow ev'ry by-way
+    $ zmq_push 
+    Every path you know
+    $ 
+
+    $ python req.py 
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low'
+    python (pid=16320): received sha1 from perl or python: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way'
+    python (pid=16320): received sha1 from perl or python: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know'
+    python (pid=16320): received sha1 from perl or python: f67665591fad08d1620c65c4c2f345b0b7083577
+    python: received 'Climb ev'ry mountain'
+    python (pid=16320): received sha1 from perl or python: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low'
+    python (pid=16320): received sha1 from perl or python: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way'
+    python (pid=16320): received sha1 from perl or python: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know'
+    python (pid=16320): received sha1 from perl or python: f67665591fad08d1620c65c4c2f345b0b7083577
+
+    $ python rep.py
+    python: received 'Climb ev'ry mountain' from client.
+    python (pid=16318): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Climb ev'ry mountain' from client.
+    python (pid=16318): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    python: received 'Search high and low' from client.
+    python (pid=16318): sending back sha1 of the received data: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    python: received 'Follow ev'ry by-way' from client.
+    python (pid=16318): sending back sha1 of the received data: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    python: received 'Every path you know' from client.
+    python (pid=16318): sending back sha1 of the received data: f67665591fad08d1620c65c4c2f345b0b7083577
+    ^C # stacktrace
+    KeyboardInterrupt
+    $ perl rep.pl # switch to perl version.
+    perl: received 'Climb ev'ry mountain' from client.
+    perl (pid=16369): sending back sha1 of the received data: f13f1d6406349941b90a283289a12c70a14b013d
+    perl: received 'Search high and low' from client.
+    perl (pid=16369): sending back sha1 of the received data: 140b1968cf58ffcf709f2f6ffd2a9d43ace95331
+    perl: received 'Follow ev'ry by-way' from client.
+    perl (pid=16369): sending back sha1 of the received data: 1d2635bc837b605e98bc8b2c6b64293971a7f121
+    perl: received 'Every path you know' from client.
+    perl (pid=16369): sending back sha1 of the received data: f67665591fad08d1620c65c4c2f345b0b7083577
+    
 
 ## Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server
 
