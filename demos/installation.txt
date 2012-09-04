@@ -21,6 +21,14 @@ See [http://www.zeromq.org/distro:_start](http://www.zeromq.org/distro:_start)
 
 For example, RHEL [http://www.zeromq.org/distro:centos](http://www.zeromq.org/distro:centos)
 
+As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run `yum` to install ZeroMQ.
+
+    yum-config-manager --add-repo http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
+    yum install zeromq
+    yum install zeromq-devel
+
+`man zmq` and it should display 0MQ 2.2.0 at the bottom of the man page.
+
 #### Mac OS X
 There is no installer with prebuilt binaries. There are two ways to install ZeroMQ on Mac OS X:
 
@@ -90,3 +98,4 @@ See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) f
 [gangnam]: http://www.youtube.com/watch?v=9bZkp7q19f0&feature=related
 [homebrew]: http://mxcl.github.com/homebrew/
 [issue6]: https://github.com/jaeheum/qzmq/issues/6
+[yum]: https://access.redhat.com/knowledge/docs/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/sec-Managing_Yum_Repositories.html
