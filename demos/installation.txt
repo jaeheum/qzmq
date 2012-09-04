@@ -47,7 +47,12 @@ One quick check for successful installation:
     $ python
     >>> import zmq
     >>> help(zmq) # to read the documentation
-    
+    >>> zmq.pyzmq_version()
+    '2.2.0'
+    >>> zmq.zmq_version()
+    '2.2.0'
+    # either '2.2.0' or '2.2.0.1' is acceptable.
+
 ## Perl
 Install [ZeroMQ.pm][perl] from CPAN:
 
@@ -55,7 +60,8 @@ Install [ZeroMQ.pm][perl] from CPAN:
 
 One quick check for successful installation:
 
-    $ perl -e 'use ZeroMQ qw/:all/;'
+    $ perl -e 'use ZeroMQ qw/:all/; print "ZeroMQ version is: " . ZeroMQ::version() . "\n";'
+    ZeroMQ version is: 2.2.0
     
 ## Java
 Currently the demo does not include any Java code. (An exercise for the readers.)

@@ -56,8 +56,13 @@ One quick check for successful installation:
     $ python
     >>> import zmq
     >>> help(zmq) # to read the documentation
-    
-<A name="toc2-60" title="Perl" />
+    >>> zmq.pyzmq_version()
+    '2.2.0'
+    >>> zmq.zmq_version()
+    '2.2.0'
+    # either '2.2.0' or '2.2.0.1' is acceptable.
+
+<A name="toc2-65" title="Perl" />
 ## Perl
 Install [ZeroMQ.pm][perl] from CPAN:
 
@@ -65,15 +70,16 @@ Install [ZeroMQ.pm][perl] from CPAN:
 
 One quick check for successful installation:
 
-    $ perl -e 'use ZeroMQ qw/:all/;'
+    $ perl -e 'use ZeroMQ qw/:all/; print "ZeroMQ version is: " . ZeroMQ::version() . "\n";'
+    ZeroMQ version is: 2.2.0
     
-<A name="toc2-70" title="Java" />
+<A name="toc2-76" title="Java" />
 ## Java
 Currently the demo does not include any Java code. (An exercise for the readers.)
 
 See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) for installation instructions and documentation of Java bindings.
 
-<A name="toc2-76" title="Q" />
+<A name="toc2-82" title="Q" />
 ## Q
 [qzmq][qzmq] installation is [still rough around edges][issue6]. In addition to ZeroMQ, qzmq uses [Czmq][czmq] which is currently only installable from source code.
 
@@ -93,4 +99,4 @@ See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) f
 [languages]: http://www.zeromq.org/bindings:_start
 [gangnam]: http://www.youtube.com/watch?v=9bZkp7q19f0&feature=related
 [homebrew]: http://mxcl.github.com/homebrew/
-[issue6]: https://github.com/jaeheum/qzmq/issues/
+[issue6]: https://github.com/jaeheum/qzmq/issues/6
