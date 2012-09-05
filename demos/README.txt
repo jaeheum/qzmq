@@ -15,10 +15,11 @@ See [installation.md][installation] for installing both ZeroMQ and language bind
 ## Running Clients/Servers In Different Languages
 
 [diagram]
- lang:bash                             lang:q                                    lang:python
+ lang:bash                             lang:q or python                          lang:python or perl
 +----------+                          +--------------+                          +-------------+
 | {io}     |                          | {io}         |                          | {io}        |
-| zmq_push | 'psy oppa gangnam style' | req.q        |                          | rep.py      |
+| zmq_push | 'psy oppa gangnam style' | req.q        |                          | rep.pl or   |
+|          |                          |   or  req.py |                          | rep.py      |
 |(ZMQ_PUSH)|------------------------->|(ZMQ_PULL)    |                          |             |
 |          |                          |              | 'psy oppa gangnam style' |             |
 |          |                          |     (ZMQ_REQ)|------------------------->|             |  
@@ -34,10 +35,11 @@ Let's set up two pairs of client/server. First pair made up with a q client (`re
 and python server (`rep.py`). Launch these two in q and python in two separate terminals:
 
     $ q req.q -q # terminal 1, substitute with 'python req.py' if either q or qzmq is not installed.
-    $ python rep.py # terminal 2
+    $ python rep.py # terminal 2 or 'perl rep.pl' for perl version.
 
 From terminal 3, start pushing text message data 
 
+    $ bash # only if you're not running bash
     $ source zmq_push.sh # write a message, hit return and hit `control-d` to terminate.
     $ zmq_push
     psy oppa gangnam style
