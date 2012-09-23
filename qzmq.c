@@ -26,6 +26,7 @@
 #include "czmq.h"
 #include "k.h"
 
+#define K0(f) K f()
 #define K3(f) K f(K x,K y,K z)
 #define K4(f) K f(K x,K y,K z,K z4)
 #define K5(f) K f(K x,K y,K z,K z4,K z5)
@@ -59,17 +60,18 @@ ZV setattachedfn(K x){r1(x);attachedfn=x;}
 ZV setdetachedfn(K x){r1(x);detachedfn=x;}
 
 Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
-Z K1(zclocktime){x=(K)0;R(kj(zclock_time()));}
+Z K0(zclocktime){R(kj(zclock_time()));}
 Z K1(zclocklog){TC(x,KC); CSTR(x); zclock_log(s); R(K)0;}
 Z K1(zclocktest){R ki(zclock_test(xg));}
 
-Z K1(zctxnew){x=(K)0; zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
+Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
 Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
 Z K2(zctxsetiothreads){PC(x); TC(y,-KI); zctx_set_iothreads(VSK(x), yi); R(K)0;}
 Z K2(zctxsetlinger){PC(x); TC(y,-KI); zctx_set_linger(VSK(x), yi); R(K)0;}
 Z K2(zctxsethwm){PC(x); TC(y,-KI); zctx_set_hwm(VSK(x), yi); R(K)0;}
 Z K1(zctxgethwm){PC(x); R ki(zctx_hwm(VSK(x)));}
 Z K1(zctxinterrupted){x=(K)0; R kb(zctx_interrupted);}
+Z K1(zctxunderlying){x=(K)0; R krr("nyi");}
 Z K1(zctxtest){R ki(zctx_test(xg));}
 
 // zfile `:path
@@ -82,6 +84,7 @@ Z K1(zfiletest){R ki(zfile_test(xg));}
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
     if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, ptr(f)); R(K)0;}
     else{zframe_t*f=zframe_new(&xg, 1); P(f, ptr(f)); R(K)0;}}
+Z K0(zframenewzerocopy){R krr("nyi");}
 Z K1(zframedestroy){PC(x); ZTK(zframe_t,f); zframe_destroy(&f); R(K)0;}
 Z K1(zframerecv){PC(x); zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
 Z K1(zframerecvnowait){PC(x); zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
@@ -91,9 +94,10 @@ Z K1(zframesize){PC(x); R kj(zframe_size(VSK(x)));}
 Z K1(zframedup){PC(x); R ptr(zframe_dup(VSK(x)));}
 //Z K1(zframestrhex){PC(x); R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
 Z K1(zframestrdup){PC(x); I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
+Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
+Z K0(zframezerocopy){R krr("nyi");}
 Z K1(zframemore){PC(x); R ki(zframe_more(VSK(x)));}
 Z K2(zframeeq){PC(x); PC(y); R kb(zframe_eq(VSK(x), VSK(y)));}
-Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
 Z K2(zframeprint){CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
@@ -102,22 +106,22 @@ static K eventfn;
 static K timerfn;
 ZV seteventfn(K x){r1(x);eventfn=x;}
 ZV settimerfn(K x){r1(x);timerfn=x;}
-Z K1(zloopnew){x=(K)0; zloop_t*l=zloop_new(); P(l, ptr(l)); R(K)0;}
+Z K0(zloopnew){zloop_t*l=zloop_new(); P(l, ptr(l)); R(K)0;}
 Z K1(zloopdestroy){PC(x); ZTK(zloop_t,l); zloop_destroy(&l); R(K)0;}
 //typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 ZI event_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
-  K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=ptr(item); kK(w)[2]=ptr(args);
-  K x=k(0, ".", eventfn, w, (K)0);
-  if(xt==-128){O("k() error: %s\n", xs);}
-  R xi;}
+    K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=ptr(item); kK(w)[2]=ptr(args);
+    K x=k(0, ".", eventfn, w, (K)0);
+    if(xt==-128){O("k() error: %s\n", xs);}
+    R xi;}
 ZV*silence(zmq_pollitem_t*item){R item;}
 //typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
-  silence(item); // for the compiler
-  K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=kj(0); /* item is null for timer */; kK(w)[2]=ptr(args);
-  K x=k(0, ".", timerfn, w, (K)0);
-  if(xt==-128){O("k() error: %s\n", xs);}
-  R xi;}
+    silence(item); // for the compiler
+    K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=kj(0); /* item is null for timer */; kK(w)[2]=ptr(args);
+    K x=k(0, ".", timerfn, w, (K)0);
+    if(xt==-128){O("k() error: %s\n", xs);}
+    R xi;}
 //    zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
 Z K4(zlooppoller){PC(x); TC(y,0); TC(z,-KS);
     ZTK(zloop_t, loop);
@@ -139,10 +143,10 @@ Z K1(zloopstart){PC(x);
     R ki(rc);}
 Z K1(zlooptest){R ki(zloop_test(xg));}
 
-Z K1(zmsgnew){x=(K)0; zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
+Z K0(zmsgnew){zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
 Z K1(zmsgdestroy){PC(x); ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
 Z K1(zmsgrecv){PC(x); R ptr(zmsg_recv(VSK(x)));}
-Z K2(zmsgsend){PC(x); PC(y); ZTK(zmsg_t,m); zmsg_send(&m, VSK(y)); R(K)0;}
+Z K2(zmsgsend){PC(x); PC(y); ZTK(zmsg_t,m); R ki(zmsg_send(&m, VSK(y)));}
 Z K1(zmsgsize){PC(x); R kj(zmsg_size(VSK(x)));}
 Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
 Z K2(zmsgpush){PC(x); PC(y); zmsg_push(VSK(x), VSK(y)); R(K)0;}
@@ -171,7 +175,7 @@ Z K1(zmsgtest){R ki(zmsg_test(xg));}
 Z K2(zsocketnew){PC(x); TC(y,-KI); R ptr(zsocket_new(VSK(x), yi));}
 Z K2(zsocketdestroy){PC(x); PC(y); zsocket_destroy(VSK(x), VSK(y)); R(K)0;}
 Z K2(zsocketbind){PC(x); TC(y,-KS); R ki(zsocket_bind(VSK(x), ys));}
-Z K2(zsocketconnect){PC(x); TC(y,-KS); zsocket_connect(VSK(x), ys); R(K)0;}
+Z K2(zsocketconnect){PC(x); TC(y,-KS); R ki(zsocket_connect(VSK(x), ys));}
 Z K1(zsockettypestr){PC(x); R ks(zsocket_type_str(VSK(x)));}
 
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -319,206 +323,217 @@ Z K3(zthreadfork){PC(x); TC(y,-KS);
     if(pipe){R ptr(pipe);}else{R krr("fork");}}
 
 // libzmq
-Z K1(version){x=(K)0; K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
+Z K0(version){K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
 Z K3(device){TC(x,-KI); PC(y); PC(z); R ki(zmq_device(xi, VSK(y), VSK(z)));}
 
-typedef struct {S k; V* f; I n;} czmqzpi;
+typedef struct {S apiname; S fnname; V* fn; I argc; S docstring;} czmqzpi; // apiname because reflection is impossible.
 Z czmqzpi zclockapi[]={
-    {"sleep", zclocksleep, 1},
-    {"time", zclocktime, 1},
-    {"log", zclocklog, 1},
-    {"test", zclocktest, 1},};
+    {"zclock", "sleep", zclocksleep, 1, "sleeps for x milliseconds (-6h)."},
+    {"zclock", "time", zclocktime, 0, "returns the current timestamp in milliseconds (-7h)."},
+    {"zclock", "log", zclocklog, 1, "prints YY-mm-dd, followed by x (10h)"},
+    {"zclock", "test", zclocktest, 1, "zclock self test"},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zctxapi[]={
-    {"new", zctxnew, 1},
-    {"destroy", zctxdestroy, 1},
-    {"set_iothreads", zctxsetiothreads, 2},
-    {"set_linger", zctxsetlinger, 2},
-    {"set_hwm", zctxsethwm, 2},
-    {"get_hwm", zctxgethwm, 1},
-    {"interrupted", zctxinterrupted, 1},
-    {"test", zctxtest, 1},};
+    {"zctx", "new", zctxnew, 0, "creates and returns a new zctx (-7h)."},
+    {"zctx", "destroy", zctxdestroy, 1, "destroys the zctx x (-7h)"},
+    {"zctx", "set_iothreads", zctxsetiothreads, 2, "sets number of threads for the zctx x (-7h) to be y (-6h)"},
+    {"zctx", "set_linger", zctxsetlinger, 2, "sets y milliseconds (-6h) to flush zsockets in the zctx x (-7h)."},
+    {"zctx", "set_hwm", zctxsethwm, 2, "sets HWM value y (-6h) for the zctx x (-7h)."},
+    {"zctx", "get_hwm", zctxgethwm, 1, "returns HWM value (-6h) for the zctx x (-7h)."},
+    {"zctx", "interrupted", zctxinterrupted, 1, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise"},
+    {"zctx", "underlying", zctxunderlying, 1, "nyi"},
+    {"zctx", "test", zctxtest, 1, "zctx self test"},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
-    {"delete", zfiledelete, 1},
-    {"mkdir", zfilemkdir, 1},
-    {"exists", zfileexists, 1},
-    {"size", zfilesize, 1},
-    {"test", zfiletest, 1},};
+    {"zfile", "delete", zfiledelete, 1, "deletes the file x (11h); returns 0i if successful, -1i otherwise."},
+    {"zfile", "mkdir", zfilemkdir, 1, "makes directory named x (11h); returns 0i if successful, -1i otherwise."},
+    {"zfile", "exists", zfileexists, 1, "returns 1i if the file x (11h) exists, 0i otherwise."},
+    {"zfile", "size", zfilesize, 1, "returns the size (-7h) of the file x (11h)."},
+    {"zfile", "test", zfiletest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zframeapi[]={
-    {"new", zframenew, 1},
-    {"destroy", zframedestroy, 1},
-    {"recv", zframerecv, 1},
-    {"recvnowait", zframerecvnowait, 1},
-    {"send", zframesend, 3},
-    {"size", zframesize, 1},
-//    {"data", zframedata, 1},
-    {"dup", zframedup, 1},
-//    {"strhex", zframestrhex, 1},
-    {"strdup", zframestrdup, 1},
-    {"streq", zframestreq, 2},
-    {"more", zframemore, 1},
-    {"eq", zframeeq, 2},
-    {"print", zframeprint, 2},
-    {"reset", zframereset, 2},
-    {"test", zframetest, 1},};
+    {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x; returns nothing on failure."},
+    {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi"},
+    {"zframe", "destroy", zframedestroy, 1, "destroys the zframe x (-7h)."},
+    {"zframe", "recv", zframerecv, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h)."},
+    {"zframe", "recvnowait", zframerecvnowait, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h) without waiting."},
+    {"zframe", "send", zframesend, 3, "sends the zframe x (-7h) to the zsocket y (-7h) with flag (-6h); returns non-zero on failure (-6h)."},
+    {"zframe", "size", zframesize, 1, "returns the byte count (-7h) of the zframe x (-7h)."},
+//    {"zframe", "data", zframedata, 1, "do.it"},
+    {"zframe", "dup", zframedup, 1, "returns a duplicate (-7h) of the zframe x (-7h)."},
+//    {"zframe", "strhex", zframestrhex, 1, "do.it"},
+    {"zframe", "strdup", zframestrdup, 1, "returns a 10h of the zframe x's data."},
+    {"zframe", "streq", zframestreq, 2, "returns whether the body of zframe x=y (10h)."},
+    {"zframe", "zero_copy", zframezerocopy, 0, "nyi."},
+    {"zframe", "more", zframemore, 1, "returns the zframe x's 'more property (-6h)."},
+    {"zframe", "eq", zframeeq, 2, "returns 1b if x=y, 0b otherwise for the zframes x and y (-7h)."},
+    {"zframe", "print", zframeprint, 2, "prints content of the zframe x (-7h) prefixed by y (10h) to stderr."},
+    {"zframe", "reset", zframereset, 2, "resets the zframe x (-7h) with the new data y."},
+    {"zframe", "test", zframetest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zloopapi[]={
-    {"new", zloopnew, 1},
-    {"destroy", zloopdestroy, 1},
-    {"poller", zlooppoller, 4},
-    {"poller_end", zlooppollerend, 2},
-    {"timer", zlooptimer, 5},
-    {"timer_end", zlooptimerend, 2},
-    {"set_verbose", zloopsetverbose, 2},
-    {"start", zloopstart, 1},
-    {"test", zlooptest, 1},};
+    {"zloop", "new", zloopnew, 0, "creates the new zloop x (-7h)."},
+    {"zloop", "destroy", zloopdestroy, 1, "destroys the zloop x (-7h)."},
+    {"zloop", "poller", zlooppoller, 4, "registers pollitem y (-7h) with the zloop x (-7h); the handler z is called with z4 when y is ready; returns 0i if there is no error, -1i otherwise."},
+    {"zloop", "poller_end", zlooppollerend, 2, "cancels the pollitem y (-7h) from the zloop x (-7h)."},
+    {"zloop", "timer", zlooptimer, 5, "registers a timer."},
+    {"zloop", "timer_end", zlooptimerend, 2, "cancels all timers for the zloop x and y."},
+    {"zloop", "set_verbose", zloopsetverbose, 2, "verbose tracing of the zloop x (-7h) to y, 1b or 0b."},
+    {"zloop", "start", zloopstart, 1, "starts zloop x; returns 0i if interrupted, -1i if cancelled by a handler."},
+    {"zloop", "test", zlooptest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zmsgapi[]={
-    {"new", zmsgnew, 1},
-    {"destroy", zmsgdestroy, 1},
-    {"recv", zmsgrecv, 1},
-    {"send", zmsgsend, 2},
-    {"size", zmsgsize, 1},
-    {"content_size", zmsgcontentsize, 1},
-    {"push", zmsgpush, 2},
-    {"pop", zmsgpop, 1},
-    {"add", zmsgadd, 2},
-//    {"pushmem", zmsgpushmem, 3},
-//    {"addmem", zmsgaddmem, 3},
-//    {"pushstr", zmsgpushstr, 2},
-//    {"addstr", zmsgaddstr, 2},
-//    {"popstr", zmsgpopstr, 1},
-    {"wrap", zmsgwrap, 2},
-    {"unwrap", zmsgunwrap, 1},
-    {"remove", zmsgremove, 1},
-    {"first", zmsgfirst, 1},
-    {"next", zmsgnext, 1},
-    {"last", zmsglast, 1},
-    {"save", zmsgsave, 2},
-    {"load", zmsgload, 2},
-//    {"encode", zmsgencode, 2},
-//    {"decode", zmsgdecode, 2},
-    {"dup", zmsgdup, 1},
-    {"dump", zmsgdump, 1},
-    {"test", zmsgtest, 1},};
+    {"zmsg", "new", zmsgnew, 0, "creates a new empty zmsg."},
+    {"zmsg", "destroy", zmsgdestroy, 1, "destroys a zmsg x."},
+    {"zmsg", "recv", zmsgrecv, 1, "receives a zmsg from zsocket x."},
+    {"zmsg", "send", zmsgsend, 2, "sends a zmsg x to zsocket y."},
+    {"zmsg", "size", zmsgsize, 1, "returns number of zframes in zmsg x."},
+    {"zmsg", "content_size", zmsgcontentsize, 1, "returns combined size of all zframes in zmsg x."},
+    {"zmsg", "push", zmsgpush, 2, "pushes the zframe y (-7h) to the front of the zmsg x (-7h)."},
+    {"zmsg", "pop", zmsgpop, 1, "pops the zframe y (-7h) from the front of the zmsg x (-7h) or raises 'empty."},
+    {"zmsg", "add", zmsgadd, 2, "adds the zframe y (-7h) to the end of the zmsg x (-7h)."},
+//    {"zmsg", "pushmem", zmsgpushmem, 3, ""},
+//    {"zmsg", "addmem", zmsgaddmem, 3, ""},
+//    {"zmsg", "pushstr", zmsgpushstr, 2, ""},
+//    {"zmsg", "addstr", zmsgaddstr, 2, ""},
+//    {"zmsg", "popstr", zmsgpopstr, 1, ""},
+    {"zmsg", "wrap", zmsgwrap, 2, ""},
+    {"zmsg", "unwrap", zmsgunwrap, 1, ""},
+    {"zmsg", "remove", zmsgremove, 1, ""},
+    {"zmsg", "first", zmsgfirst, 1, "returns the first zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
+    {"zmsg", "next", zmsgnext, 1, "returns the next zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
+    {"zmsg", "last", zmsglast, 1, "returns the last zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
+    {"zmsg", "save", zmsgsave, 2, "saves the zmsg x (-7h) to the file y (11h)."},
+    {"zmsg", "load", zmsgload, 2, "loads the file y (11h) into the zmsg x (-7h)"},
+//    {"zmsg", "encode", zmsgencode, 2, ""},
+//    {"zmsg", "decode", zmsgdecode, 2, ""},
+    {"zmsg", "dup", zmsgdup, 1, "returns a duplicate of zmsg x."},
+    {"zmsg", "dump", zmsgdump, 1, "dumps the content of zmsg x."},
+    {"zmsg", "test", zmsgtest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsocketapi[]={
-    {"new", zsocketnew, 2},
-    {"destroy", zsocketdestroy, 2},
-    {"bind", zsocketbind, 2},
-    {"connect", zsocketconnect, 2},
-    {"type_sym", zsockettypestr, 1},};
+    {"zsocket", "new", zsocketnew, 2, "returns a new zsocket of type y for zctx x."},
+    {"zsocket", "destroy", zsocketdestroy, 2, "destroys a zsocket y for zctx x."},
+    {"zsocket", "bind", zsocketbind, 2, "binds zsocket x to URL y."},
+    {"zsocket", "connect", zsocketconnect, 2, "connects zsockt x to URL y"},
+    {"zsocket", "type_sym", zsockettypestr, 1, "prints do.it "},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsockoptapi[]={
 #if (ZMQ_VERSION_MAJOR == 2)
-    {"hwm", zsockethwm, 1},
-    {"swap", zsocketswap, 1},
-    {"affinity", zsocketaffinity, 1},
-    {"identity", zsocketidentity, 1},
-    {"rate", zsocketrate, 1},
-    {"recovery_ivl", zsocketrecovery_ivl, 1},
-    {"recovery_ivl_msec", zsocketrecovery_ivl_msec, 1},
-    {"mcast_loop", zsocketmcast_loop, 1},
+    {"zsockopt", "hwm", zsockethwm, 1, ""},
+    {"zsockopt", "swap", zsocketswap, 1, ""},
+    {"zsockopt", "affinity", zsocketaffinity, 1, ""},
+    {"zsockopt", "identity", zsocketidentity, 1, ""},
+    {"zsockopt", "rate", zsocketrate, 1, ""},
+    {"zsockopt", "recovery_ivl", zsocketrecovery_ivl, 1, ""},
+    {"zsockopt", "recovery_ivl_msec", zsocketrecovery_ivl_msec, 1, ""},
+    {"zsockopt", "mcast_loop", zsocketmcast_loop, 1, ""},
 #   if (ZMQ_VERSION_MINOR == 2)
-    {"rcvtimeo", zsocketrcvtimeo, 1},
+    {"zsockopt", "rcvtimeo", zsocketrcvtimeo, 1, ""},
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
-    {"sndtimeo", zsocketsndtimeo, 1},
+    {"zsockopt", "sndtimeo", zsocketsndtimeo, 1, ""},
 #   endif
-    {"sndbuf", zsocketsndbuf, 1},
-    {"rcvbuf", zsocketrcvbuf, 1},
-    {"linger", zsocketlinger, 1},
-    {"reconnect_ivl", zsocketreconnect_ivl, 1},
-    {"reconnect_ivl_max", zsocketreconnect_ivl_max, 1},
-    {"backlog", zsocketbacklog, 1},
-    {"type", zsockettype, 1},
-    {"rcvmore", zsocketrcvmore, 1},
-    {"fd", zsocketfd, 1},
-    {"events", zsocketevents, 1},
-    {"set_hwm", zsocketsethwm, 2},
-    {"set_swap", zsocketsetswap, 2},
-    {"set_affinity", zsocketsetaffinity, 2},
-    {"set_identity", zsocketsetidentity, 2},
-    {"set_rate", zsocketsetrate, 2},
-    {"set_recovery_ivl", zsocketsetrecovery_ivl, 2},
-    {"set_recovery_ivl_msec", zsocketsetrecovery_ivl_msec, 2},
-    {"set_mcast_loop", zsocketsetmcast_loop, 2},
+    {"zsockopt", "sndbuf", zsocketsndbuf, 1, ""},
+    {"zsockopt", "rcvbuf", zsocketrcvbuf, 1, ""},
+    {"zsockopt", "linger", zsocketlinger, 1, ""},
+    {"zsockopt", "reconnect_ivl", zsocketreconnect_ivl, 1, ""},
+    {"zsockopt", "reconnect_ivl_max", zsocketreconnect_ivl_max, 1, ""},
+    {"zsockopt", "backlog", zsocketbacklog, 1, ""},
+    {"zsockopt", "type", zsockettype, 1, ""},
+    {"zsockopt", "rcvmore", zsocketrcvmore, 1, ""},
+    {"zsockopt", "fd", zsocketfd, 1, ""},
+    {"zsockopt", "events", zsocketevents, 1, ""},
+    {"zsockopt", "set_hwm", zsocketsethwm, 2, ""},
+    {"zsockopt", "set_swap", zsocketsetswap, 2, ""},
+    {"zsockopt", "set_affinity", zsocketsetaffinity, 2, ""},
+    {"zsockopt", "set_identity", zsocketsetidentity, 2, ""},
+    {"zsockopt", "set_rate", zsocketsetrate, 2, ""},
+    {"zsockopt", "set_recovery_ivl", zsocketsetrecovery_ivl, 2, ""},
+    {"zsockopt", "set_recovery_ivl_msec", zsocketsetrecovery_ivl_msec, 2, ""},
+    {"zsockopt", "set_mcast_loop", zsocketsetmcast_loop, 2, ""},
 #   if (ZMQ_VERSION_MINOR == 2)
-    {"set_rcvtimeo", zsocketsetrcvtimeo, 2},
+    {"zsockopt", "set_rcvtimeo", zsocketsetrcvtimeo, 2, ""},
 #   endif
 #   if (ZMQ_VERSION_MINOR == 2)
-    {"set_sndtimeo", zsocketsetsndtimeo, 2},
+    {"zsockopt", "set_sndtimeo", zsocketsetsndtimeo, 2, ""},
 #   endif
-    {"set_sndbuf", zsocketsetsndbuf, 2},
-    {"set_rcvbuf", zsocketsetrcvbuf, 2},
-    {"set_linger", zsocketsetlinger, 2},
-    {"set_reconnect_ivl", zsocketsetreconnect_ivl, 2},
-    {"set_reconnect_ivl_max", zsocketsetreconnect_ivl_max, 2},
-    {"set_backlog", zsocketsetbacklog, 2},
-    {"set_subscribe", zsocketsetsubscribe, 2},
-    {"set_unsubscribe", zsocketsetunsubscribe, 2},
+    {"zsockopt", "set_sndbuf", zsocketsetsndbuf, 2, ""},
+    {"zsockopt", "set_rcvbuf", zsocketsetrcvbuf, 2, ""},
+    {"zsockopt", "set_linger", zsocketsetlinger, 2, ""},
+    {"zsockopt", "set_reconnect_ivl", zsocketsetreconnect_ivl, 2, ""},
+    {"zsockopt", "set_reconnect_ivl_max", zsocketsetreconnect_ivl_max, 2, ""},
+    {"zsockopt", "set_backlog", zsocketsetbacklog, 2, ""},
+    {"zsockopt", "set_subscribe", zsocketsetsubscribe, 2, ""},
+    {"zsockopt", "set_unsubscribe", zsocketsetunsubscribe, 2, ""},
 #endif
 #if (ZMQ_VERSION_MAJOR == 3)
-    {"type", zsockettype, 1},
-    {"sndhwm", zsocketsndhwm, 1},
-    {"rcvhwm", zsocketrcvhwm, 1},
-    {"affinity", zsocketaffinity, 1},
-    {"identity", zsocketidentity, 1},
-    {"rate", zsocketrate, 1},
-    {"recovery_ivl", zsocketrecovery_ivl, 1},
-    {"sndbuf", zsocketsndbuf, 1},
-    {"rcvbuf", zsocketrcvbuf, 1},
-    {"linger", zsocketlinger, 1},
-    {"reconnect_ivl", zsocketreconnect_ivl, 1},
-    {"reconnect_ivl_max", zsocketreconnect_ivl_max, 1},
-    {"backlog", zsocketbacklog, 1},
-    {"maxmsgsize", zsocketmaxmsgsize, 1},
-    {"ipv4only", zsocketipv4only, 1},
-    {"rcvmore", zsocketrcvmore, 1},
-    {"fd", zsocketfd, 1},
-    {"events", zsocket_events, 1},
-    {"last_endpoint", zsocket_last_endpoint, 1},
-    {"set_sndhwm", zsocketsetsndhwm, 2},
-    {"set_rcvhwm", zsocketsetrcvhwm, 2},
-    {"set_affinity", zsocketsetaffinity, 2},
-    {"set_subscribe", zsocketsetsubscribe, 2},
-    {"set_unsubscribe", zsocketsetunsubscribe, 2},
-    {"set_identity", zsocketsetidentity, 2},
-    {"set_rate", zsocketsetrate, 2},
-    {"set_recovery_ivl", zsocketsetrecovery_ivl, 2},
-    {"set_sndbuf", zsocketsetsndbuf, 2},
-    {"set_rcvbuf", zsocketsetrcvbuf, 2},
-    {"set_linger", zsocketsetlinger, 2},
-    {"set_reconnect_ivl", zsocketsetreconnect_ivl, 2},
-    {"set_reconnect_ivl_max", zsocketsetreconnect_ivl_max, 2},
-    {"set_multicast_hops", zsocketsetmulticast_hops, 2},
-    {"set_backlog", zsocketsetbacklog, 2},
-    {"set_maxmsgsize", zsocketsetmaxmsgsize, 2},
-    {"set_multicast_hops", zsocketmulticast_hops, 2},
-    {"set_rcvtimeo", zsocketsetrcvtimeo, 2},
-    {"set_sndtimeo", zsocketsetsndtimeo, 2},
-    {"set_ipv4only", zsocketsetipv4only, 2},
-    {"set_failunroutable", zsocketsetfailunroutable, 2},
-    {"set_hwm", zsocketsethwm, 2},
+    {"zsockopt", "type", zsockettype, 1, ""},
+    {"zsockopt", "sndhwm", zsocketsndhwm, 1, ""},
+    {"zsockopt", "rcvhwm", zsocketrcvhwm, 1, ""},
+    {"zsockopt", "affinity", zsocketaffinity, 1, ""},
+    {"zsockopt", "identity", zsocketidentity, 1, ""},
+    {"zsockopt", "rate", zsocketrate, 1, ""},
+    {"zsockopt", "recovery_ivl", zsocketrecovery_ivl, 1, ""},
+    {"zsockopt", "sndbuf", zsocketsndbuf, 1, ""},
+    {"zsockopt", "rcvbuf", zsocketrcvbuf, 1, ""},
+    {"zsockopt", "linger", zsocketlinger, 1, ""},
+    {"zsockopt", "reconnect_ivl", zsocketreconnect_ivl, 1, ""},
+    {"zsockopt", "reconnect_ivl_max", zsocketreconnect_ivl_max, 1, ""},
+    {"zsockopt", "backlog", zsocketbacklog, 1, ""},
+    {"zsockopt", "maxmsgsize", zsocketmaxmsgsize, 1, ""},
+    {"zsockopt", "ipv4only", zsocketipv4only, 1, ""},
+    {"zsockopt", "rcvmore", zsocketrcvmore, 1, ""},
+    {"zsockopt", "fd", zsocketfd, 1, ""},
+    {"zsockopt", "events", zsocket_events, 1, ""},
+    {"zsockopt", "last_endpoint", zsocket_last_endpoint, 1, ""},
+    {"zsockopt", "set_sndhwm", zsocketsetsndhwm, 2, ""},
+    {"zsockopt", "set_rcvhwm", zsocketsetrcvhwm, 2, ""},
+    {"zsockopt", "set_affinity", zsocketsetaffinity, 2, ""},
+    {"zsockopt", "set_subscribe", zsocketsetsubscribe, 2, ""},
+    {"zsockopt", "set_unsubscribe", zsocketsetunsubscribe, 2, ""},
+    {"zsockopt", "set_identity", zsocketsetidentity, 2, ""},
+    {"zsockopt", "set_rate", zsocketsetrate, 2, ""},
+    {"zsockopt", "set_recovery_ivl", zsocketsetrecovery_ivl, 2, ""},
+    {"zsockopt", "set_sndbuf", zsocketsetsndbuf, 2, ""},
+    {"zsockopt", "set_rcvbuf", zsocketsetrcvbuf, 2, ""},
+    {"zsockopt", "set_linger", zsocketsetlinger, 2, ""},
+    {"zsockopt", "set_reconnect_ivl", zsocketsetreconnect_ivl, 2, ""},
+    {"zsockopt", "set_reconnect_ivl_max", zsocketsetreconnect_ivl_max, 2, ""},
+    {"zsockopt", "set_multicast_hops", zsocketsetmulticast_hops, 2, ""},
+    {"zsockopt", "set_backlog", zsocketsetbacklog, 2, ""},
+    {"zsockopt", "set_maxmsgsize", zsocketsetmaxmsgsize, 2, ""},
+    {"zsockopt", "set_multicast_hops", zsocketmulticast_hops, 2, ""},
+    {"zsockopt", "set_rcvtimeo", zsocketsetrcvtimeo, 2, ""},
+    {"zsockopt", "set_sndtimeo", zsocketsetsndtimeo, 2, ""},
+    {"zsockopt", "set_ipv4only", zsocketsetipv4only, 2, ""},
+    {"zsockopt", "set_failunroutable", zsocketsetfailunroutable, 2, ""},
+    {"zsockopt", "set_hwm", zsocketsethwm, 2, ""},
 #endif
-    {"test", zsockopttest, 1},
-};
-
+    {"zsockopt", "test", zsockopttest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zstrapi[]={
-    {"recv", zstrrecv, 1},
-    {"recv_nowait", zstrrecvnowait, 1},
-    {"send", zstrsend, 2},
-    {"sendm", zstrsendm, 2},
-    {"send0", zstrsend0, 2},
-    {"test", zstrtest, 1},};
+    {"zstr", "recv", zstrrecv, 1, "returns a 10h received from the zsocket x (-7h)."},
+    {"zstr", "recv_nowait", zstrrecvnowait, 1, "returns a 10h received from the zsocket x (-7h) without waiting."},
+    {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x (-7h)."},
+    {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x (-7h) with MORE flag."},
+    {"zstr", "send0", zstrsend0, 2, ""},
+    {"zstr", "test", zstrtest, 1, ""},
+    {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
-    {"new", zthreadnew, 2},
-    {"fork", zthreadfork, 3},
-};
+    {"zthread", "new", zthreadnew, 2, "creates a detached thread with the function x and arguments y."},
+    {"zthread", "fork", zthreadfork, 3, "creates an attached thread running in the zctx x with function y and arguments z."},
+    {NULL,NULL,NULL,0,NULL},};
 Z czmqzpi libzmqapi[] = {
-    {"version", version, 1},
-    {"device", device, 3},
-};
+    {"libzmq", "version", version, 0, "returns major, minor, patch version numbers (6h) of libzmq."},
+    {"libzmq", "device", device, 3, ""},
+    {NULL,NULL,NULL,0,NULL}};
 
-#define APITAB(k,f,n) xS[i]=ss(k);kK(y)[i]=dl(f,n)
-#define EXPAPI(name) K1(name){int n=tblsize(name##api);K y=ktn(0,n);x=ktn(KS,n); \
-  DO(tblsize(name##api), APITAB(name##api[i].k, name##api[i].f, name##api[i].n)); \
-  R xD(x,y);}
+// if argc==0, set it to 1 otherwise 'rank
+#define APITAB(fnname,fn,argc) xS[i]=ss(fnname);kK(y)[i]=dl(fn,argc>0?argc:1)
+#define EXPAPI(name) K1(name){int n=tblsize(name##api)-1; K y=ktn(0,n);x=ktn(KS,n); \
+    DO(n, APITAB(name##api[i].fnname, name##api[i].fn, name##api[i].argc)); \
+    R xD(x,y);}
 
 EXPAPI(zclock);
 EXPAPI(zctx);
@@ -531,6 +546,17 @@ EXPAPI(zsockopt);
 EXPAPI(zstr);
 EXPAPI(zthread);
 EXPAPI(libzmq);
+
+// do.it generate args list based on argc.
+K1(doc){x=(K)0;
+    czmqzpi* apis[] = {zclockapi, zctxapi, zfileapi, zframeapi, zloopapi, zmsgapi, zsocketapi, zsockoptapi, zstrapi, zthreadapi, libzmqapi};
+    czmqzpi **each = apis;
+    x=ktn(KS,0); K y=ktn(KS,0); C s[40];
+    for(int i = 0; i < (int)tblsize(apis); i++) {
+        for (int j = 0; each[i][j].fnname != NULL; j++) {
+            snprintf(s, sizeof(s), "%s.%s", each[i][j].apiname, each[i][j].fnname);
+            js(&x,ss(s)); js(&y,ss(each[i][j].docstring));}}
+    R xD(x,y);}
 
 //  Socket types, options, …
 Z struct {S k; I v;} zmqopt[] = {
