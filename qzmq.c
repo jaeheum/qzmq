@@ -26,7 +26,7 @@
 #include "czmq.h"
 #include "k.h"
 
-#define K0(f) K f()
+#define K0(f) K f(void)
 #define K3(f) K f(K x,K y,K z)
 #define K4(f) K f(K x,K y,K z,K z4)
 #define K5(f) K f(K x,K y,K z,K z4,K z5)
@@ -45,7 +45,7 @@
 #define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
-#define CSTR(x) S s;if(x->n!=1){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;}
+#define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // xn can be unset.
 #define TC(x,T) P(x->t!=T, krr("type"))
 #define TC2(x,T,T2) P(x->t!=T&&x->t!=T2, krr("type"))
 #define PC(x) TC(x,-KJ)
@@ -98,7 +98,7 @@ Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s));
 Z K0(zframezerocopy){R krr("nyi");}
 Z K1(zframemore){PC(x); R ki(zframe_more(VSK(x)));}
 Z K2(zframeeq){PC(x); PC(y); R kb(zframe_eq(VSK(x), VSK(y)));}
-Z K2(zframeprint){CSTR(y); zframe_print(VSK(x), s); R(K)0;}
+Z K2(zframeprint){TC(y,KC); CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 Z K1(zframetest){R ki(zframe_test(xg));}
 
@@ -551,9 +551,9 @@ EXPAPI(libzmq);
 K1(doc){x=(K)0;
     czmqzpi* apis[] = {zclockapi, zctxapi, zfileapi, zframeapi, zloopapi, zmsgapi, zsocketapi, zsockoptapi, zstrapi, zthreadapi, libzmqapi};
     czmqzpi **each = apis;
-    x=ktn(KS,0); K y=ktn(KS,0); C s[40];
-    for(int i = 0; i < (int)tblsize(apis); i++) {
-        for (int j = 0; each[i][j].fnname != NULL; j++) {
+    x=ktn(KS,0); K y=ktn(KS,0); C s[40]; I i=0; I j=0;
+    for(; i < (int)tblsize(apis); i++) {
+        for (; each[i][j].fnname != NULL; j++) {
             snprintf(s, sizeof(s), "%s.%s", each[i][j].apiname, each[i][j].fnname);
             js(&x,ss(s)); js(&y,ss(each[i][j].docstring));}}
     R xD(x,y);}
