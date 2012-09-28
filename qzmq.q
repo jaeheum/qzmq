@@ -10,6 +10,9 @@ zsockopt:(`qzmq 2:(`zsockopt;1))`
 zstr:(`qzmq 2:(`zstr;1))`
 zthread:(`qzmq 2:(`zthread;1))`
 libzmq:(`qzmq 2:(`libzmq;1))`
+\d .qzmq
+doc:(`qzmq 2:(`makedoc;1))[] // create .qzmq.doc table but don't import makedoc[].
+
 \
     qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
@@ -19,7 +22,7 @@ libzmq:(`qzmq 2:(`libzmq;1))`
     This file is part of qzmq.
 
     qzmq is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -28,6 +31,6 @@ libzmq:(`qzmq 2:(`libzmq;1))`
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Affero General Public License
     along with qzmq.  If not, see <http://www.gnu.org/licenses/>.
 

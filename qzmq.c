@@ -6,7 +6,7 @@
     This file is part of qzmq.
 
     qzmq is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
@@ -15,7 +15,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Affero General Public License
     along with qzmq.  If not, see <http://www.gnu.org/licenses/>.
 */
 
@@ -46,8 +46,8 @@
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
 #define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // xn can be unset.
-#define TC(x,T) P(x->t!=T, krr("type"))
-#define TC2(x,T,T2) P(x->t!=T&&x->t!=T2, krr("type"))
+#define TC(x,T) P(x->t!=T,krr("type"))
+#define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
 #define PC(x) TC(x,-KJ)
 
 ZI N(K x){if(xt>0)R xn;R 1;}
@@ -182,8 +182,7 @@ Z K1(zsockettypestr){PC(x); R ks(zsocket_type_str(VSK(x)));}
 Z K1(zsockethwm){PC(x); R ki(zsocket_hwm(VSK(x)));}
 Z K1(zsocketswap){PC(x); R ki(zsocket_swap(VSK(x)));}
 Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
-Z K1(zsocketidentity){PC(x);
-    size_t n=255; S s=(S)malloc(n);  I r; K id;
+Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
         else{R krr("malloc");}} 
@@ -235,8 +234,7 @@ Z K1(zsockettype){PC(x); R ki(zsocket_type(VSK(x)));}
 Z K1(zsocketsndhwm){PC(x); R ki(zsocket_sndhwm(VSK(x)));}
 Z K1(zsocketrcvhwm){PC(x); R ki(zsocket_rcvhwm(VSK(x)));}
 Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
-Z K1(zsocketidentity){PC(x);
-    size_t n=255; S s=(S)malloc(n);  I r; K id;
+Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
         else{R krr("malloc");}} 
@@ -547,16 +545,28 @@ EXPAPI(zstr);
 EXPAPI(zthread);
 EXPAPI(libzmq);
 
-// do.it generate args list based on argc.
-K1(doc){x=(K)0;
-    czmqzpi* apis[] = {zclockapi, zctxapi, zfileapi, zframeapi, zloopapi, zmsgapi, zsocketapi, zsockoptapi, zstrapi, zthreadapi, libzmqapi};
+// generate args list based on argc.
+ZS printargs(I argc){SW(argc){CS(0,R"[]")CS(1,R"[x]")CS(2,R"[x;y]")CS(3,R"[x;y;z]")CS(4,R"[x;y;z;z4]")CS(5,R"[x;y;z;z4;z5]")CD:R"";}}
+
+// doc is a table keyed by `api.fnname with args and docstring columns
+K0(makedoc){
+    czmqzpi* apis[] = {zclockapi, zctxapi, zfileapi, zframeapi, zloopapi, zmsgapi, zsocketapi, /*zsockoptapi,*/ zstrapi, zthreadapi, libzmqapi};
     czmqzpi **each = apis;
-    x=ktn(KS,0); K y=ktn(KS,0); C s[40]; I i=0; I j=0;
-    for(; i < (int)tblsize(apis); i++) {
-        for (; each[i][j].fnname != NULL; j++) {
+    C s[40]; I i,j;
+    K key,kc,kd, val, vc, argz, docstrings;
+    kc=ktn(KS,1); kS(kc)[0]=ss("method"); kd=ktn(KS,0);
+    vc=ktn(KS,2); kS(vc)[0]=ss("args"); kS(vc)[1]=ss("docstring");
+    argz=ktn(KS,0); docstrings=ktn(KS,0);
+    for(i=0; i < (int)tblsize(apis); i++) {
+        for (j=0; each[i][j].fnname != NULL; j++) {
             snprintf(s, sizeof(s), "%s.%s", each[i][j].apiname, each[i][j].fnname);
-            js(&x,ss(s)); js(&y,ss(each[i][j].docstring));}}
-    R xD(x,y);}
+            js(&kd,ss(s));
+            js(&argz, ss(printargs(each[i][j].argc)));
+            js(&docstrings,ss(each[i][j].docstring));}}
+    // special cases for zsockoptapi
+    js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("c.f. http://czmq.zeromq.org/manual:zsockopt"));
+    key=xT(xD(kc, knk(1,kd))); val=xT(xD(vc, knk(2,argz,docstrings)));
+    R xD(key,val);}
 
 //  Socket types, options, …
 Z struct {S k; I v;} zmqopt[] = {
