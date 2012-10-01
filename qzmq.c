@@ -54,11 +54,6 @@ ZI N(K x){if(xt>0)R xn;R 1;}
 Z K qstr(S s){R s!=NULL?kp(s):(K)0;}
 Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}}
 
-static K attachedfn;
-static K detachedfn;
-ZV setattachedfn(K x){r1(x);attachedfn=x;}
-ZV setdetachedfn(K x){r1(x);detachedfn=x;}
-
 Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
 Z K0(zclocktime){R(kj(zclock_time()));}
 Z K1(zclocklog){TC(x,KC); CSTR(x); zclock_log(s); R(K)0;}
@@ -90,9 +85,9 @@ Z K1(zframerecv){PC(x); zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
 Z K1(zframerecvnowait){PC(x); zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
 Z K3(zframesend){PC(x); PC(y); TC(z,-KI);  ZTK(zframe_t,f); R ki(zframe_send(&f, VSK(y), zi));}
 Z K1(zframesize){PC(x); R kj(zframe_size(VSK(x)));}
-// zframe_data() is unsafe, too low-level for q.
+Z K1(zframedata){x=(K)0; R krr("nyi");}// zframe_data() is unsafe, too low-level for q.
 Z K1(zframedup){PC(x); R ptr(zframe_dup(VSK(x)));}
-//Z K1(zframestrhex){PC(x); R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
+Z K1(zframestrhex){x=(K)0; R krr("nyi");}//{PC(x); R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
 Z K1(zframestrdup){PC(x); I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
 Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
 Z K0(zframezerocopy){R krr("nyi");}
@@ -152,11 +147,11 @@ Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
 Z K2(zmsgpush){PC(x); PC(y); zmsg_push(VSK(x), VSK(y)); R(K)0;}
 Z K1(zmsgpop){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
 Z K2(zmsgadd){PC(x); PC(y); zmsg_add(VSK(x), VSK(y)); R(K)0;}
-//Z K3(zmsgpushmem){zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
-//Z K3(zmsgaddmem){zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
-//Z K2(zmsgpushstr){CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
-//Z K2(zmsgaddstr){CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
-//Z K1(zmsgpopstr){R kp(zmsg_popstr(VSK(x)));}
+Z K3(zmsgpushmem){x=y=z=(K)0; R krr("nyi");}//{zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
+Z K3(zmsgaddmem){x=y=z=(K)0; R krr("nyi");}//{zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
+Z K2(zmsgpushstr){x=y=(K)0; R krr("nyi");}//{CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
+Z K2(zmsgaddstr){x=y=(K)0; R krr("nyi");}//{CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
+Z K1(zmsgpopstr){x=(K)0; R krr("nyi");}//{R kp(zmsg_popstr(VSK(x)));}
 Z K2(zmsgwrap){PC(x); PC(y); zmsg_wrap(VSK(x), VSK(y));R(K)0;}
 Z K1(zmsgunwrap){PC(x); R ptr(zmsg_unwrap(VSK(x)));}
 Z K2(zmsgremove){PC(x); PC(y); zmsg_remove(VSK(x), VSK(y)); R(K)0;}
@@ -166,8 +161,8 @@ Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("emp
 Z K2(zmsgsave){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
 Z K2(zmsgload){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 //TODO(hjh): use kdb for saving/loading
-//Z K2(zmsgencode){R kj(zmsg_encode(VSK(x), VSK(y)));}
-//Z K2(zmsgdecode){R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
+Z K2(zmsgencode){x=y=(K)0; R krr("nyi");}//{R kj(zmsg_encode(VSK(x), VSK(y)));}
+Z K2(zmsgdecode){x=y=(K)0; R krr("nyi");}//{R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
 Z K1(zmsgdup){PC(x); zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
 Z K1(zmsgdump){PC(x); zmsg_dump(VSK(x)); R(K)0;}
 Z K1(zmsgtest){R ki(zmsg_test(xg));}
@@ -284,14 +279,20 @@ Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)fre
 Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
 Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
 // zero-copy or zmq_msg_init_data() takes over the ownership of kC(y) or yG buffer (but we don't let it write/free yG).
+/*
 Z K2(zstrsend0){PC(x); TC2(y,KC,-KC); r1(y); zmq_msg_t msg; // keep y in place at least (q main thread owns y)
     if(yt>0){zmq_msg_init_data(&msg, (S)kC(y), yn, NULL, NULL);}
     else{zmq_msg_init_data(&msg, &yg, 1, NULL, NULL);}
     I rc=zmq_sendmsg (VSK(x), &msg, 0);
     zmq_msg_close (&msg);
     R rc==0?y:(K)0;}
-
+*/
 Z K1(zstrtest){R ki(zstr_test(xg));}
+
+static K attachedfn;
+static K detachedfn;
+ZV setattachedfn(K x){r1(x);attachedfn=x;}
+ZV setdetachedfn(K x){r1(x);detachedfn=x;}
 
 //typedef void *(zthread_detached_fn) (void *args);
 ZV*df(V*args){
@@ -357,9 +358,9 @@ Z czmqzpi zframeapi[]={
     {"zframe", "recvnowait", zframerecvnowait, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h) without waiting."},
     {"zframe", "send", zframesend, 3, "sends the zframe x (-7h) to the zsocket y (-7h) with flag (-6h); returns non-zero on failure (-6h)."},
     {"zframe", "size", zframesize, 1, "returns the byte count (-7h) of the zframe x (-7h)."},
-//    {"zframe", "data", zframedata, 1, "do.it"},
+    {"zframe", "data", zframedata, 1, "nyi."},
     {"zframe", "dup", zframedup, 1, "returns a duplicate (-7h) of the zframe x (-7h)."},
-//    {"zframe", "strhex", zframestrhex, 1, "do.it"},
+    {"zframe", "strhex", zframestrhex, 1, "nyi."},
     {"zframe", "strdup", zframestrdup, 1, "returns a 10h of the zframe x's data."},
     {"zframe", "streq", zframestreq, 2, "returns whether the body of zframe x=y (10h)."},
     {"zframe", "zero_copy", zframezerocopy, 0, "nyi."},
@@ -390,11 +391,11 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "push", zmsgpush, 2, "pushes the zframe y (-7h) to the front of the zmsg x (-7h)."},
     {"zmsg", "pop", zmsgpop, 1, "pops the zframe y (-7h) from the front of the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "add", zmsgadd, 2, "adds the zframe y (-7h) to the end of the zmsg x (-7h)."},
-//    {"zmsg", "pushmem", zmsgpushmem, 3, ""},
-//    {"zmsg", "addmem", zmsgaddmem, 3, ""},
-//    {"zmsg", "pushstr", zmsgpushstr, 2, ""},
-//    {"zmsg", "addstr", zmsgaddstr, 2, ""},
-//    {"zmsg", "popstr", zmsgpopstr, 1, ""},
+    {"zmsg", "pushmem", zmsgpushmem, 3, "nyi."},
+    {"zmsg", "addmem", zmsgaddmem, 3, "nyi."},
+    {"zmsg", "pushstr", zmsgpushstr, 2, "nyi."},
+    {"zmsg", "addstr", zmsgaddstr, 2, "nyi."},
+    {"zmsg", "popstr", zmsgpopstr, 1, "nyi."},
     {"zmsg", "wrap", zmsgwrap, 2, ""},
     {"zmsg", "unwrap", zmsgunwrap, 1, ""},
     {"zmsg", "remove", zmsgremove, 1, ""},
@@ -403,8 +404,8 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "last", zmsglast, 1, "returns the last zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "save", zmsgsave, 2, "saves the zmsg x (-7h) to the file y (11h)."},
     {"zmsg", "load", zmsgload, 2, "loads the file y (11h) into the zmsg x (-7h)"},
-//    {"zmsg", "encode", zmsgencode, 2, ""},
-//    {"zmsg", "decode", zmsgdecode, 2, ""},
+    {"zmsg", "encode", zmsgencode, 2, "nyi."},
+    {"zmsg", "decode", zmsgdecode, 2, "nyi."},
     {"zmsg", "dup", zmsgdup, 1, "returns a duplicate of zmsg x."},
     {"zmsg", "dump", zmsgdump, 1, "dumps the content of zmsg x."},
     {"zmsg", "test", zmsgtest, 1, ""},
@@ -515,7 +516,7 @@ Z czmqzpi zstrapi[]={
     {"zstr", "recv_nowait", zstrrecvnowait, 1, "returns a 10h received from the zsocket x (-7h) without waiting."},
     {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x (-7h)."},
     {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x (-7h) with MORE flag."},
-    {"zstr", "send0", zstrsend0, 2, ""},
+//    {"zstr", "send0", zstrsend0, 2, ""},
     {"zstr", "test", zstrtest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
