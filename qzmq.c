@@ -278,15 +278,6 @@ Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
 Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
 Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
 Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
-// zero-copy or zmq_msg_init_data() takes over the ownership of kC(y) or yG buffer (but we don't let it write/free yG).
-/*
-Z K2(zstrsend0){PC(x); TC2(y,KC,-KC); r1(y); zmq_msg_t msg; // keep y in place at least (q main thread owns y)
-    if(yt>0){zmq_msg_init_data(&msg, (S)kC(y), yn, NULL, NULL);}
-    else{zmq_msg_init_data(&msg, &yg, 1, NULL, NULL);}
-    I rc=zmq_sendmsg (VSK(x), &msg, 0);
-    zmq_msg_close (&msg);
-    R rc==0?y:(K)0;}
-*/
 Z K1(zstrtest){R ki(zstr_test(xg));}
 
 static K attachedfn;
@@ -516,7 +507,6 @@ Z czmqzpi zstrapi[]={
     {"zstr", "recv_nowait", zstrrecvnowait, 1, "returns a 10h received from the zsocket x (-7h) without waiting."},
     {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x (-7h)."},
     {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x (-7h) with MORE flag."},
-//    {"zstr", "send0", zstrsend0, 2, ""},
     {"zstr", "test", zstrtest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
