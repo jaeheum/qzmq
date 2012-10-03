@@ -65,8 +65,8 @@ Z K2(zctxsetiothreads){PC(x); TC(y,-KI); zctx_set_iothreads(VSK(x), yi); R(K)0;}
 Z K2(zctxsetlinger){PC(x); TC(y,-KI); zctx_set_linger(VSK(x), yi); R(K)0;}
 Z K2(zctxsethwm){PC(x); TC(y,-KI); zctx_set_hwm(VSK(x), yi); R(K)0;}
 Z K1(zctxgethwm){PC(x); R ki(zctx_hwm(VSK(x)));}
-Z K1(zctxinterrupted){x=(K)0; R kb(zctx_interrupted);}
-Z K1(zctxunderlying){x=(K)0; R krr("nyi");}
+Z K0(zctxinterrupted){R kb(zctx_interrupted);}
+Z K0(zctxunderlying){R krr("nyi");}
 Z K1(zctxtest){R ki(zctx_test(xg));}
 
 // zfile `:path
@@ -85,9 +85,9 @@ Z K1(zframerecv){PC(x); zframe_t*f=zframe_recv(VSK(x)); P(f, ptr(f)); R(K)0;}
 Z K1(zframerecvnowait){PC(x); zframe_t*f=zframe_recv_nowait(VSK(x)); P(f, ptr(f)); R(K)0;}
 Z K3(zframesend){PC(x); PC(y); TC(z,-KI);  ZTK(zframe_t,f); R ki(zframe_send(&f, VSK(y), zi));}
 Z K1(zframesize){PC(x); R kj(zframe_size(VSK(x)));}
-Z K1(zframedata){x=(K)0; R krr("nyi");}// zframe_data() is unsafe, too low-level for q.
+Z K0(zframedata){R krr("nyi");}// zframe_data() is unsafe, too low-level for q.
 Z K1(zframedup){PC(x); R ptr(zframe_dup(VSK(x)));}
-Z K1(zframestrhex){x=(K)0; R krr("nyi");}//{PC(x); R qstr(zframe_strhex(VSK(x)));} // not necessary?? -9!strdup will do?
+Z K0(zframestrhex){R krr("nyi");}
 Z K1(zframestrdup){PC(x); I n=zframe_size(VSK(x)); K y=ktn(KG,n); memcpy(yG, zframe_data(VSK(x)), n); R y;}
 Z K2(zframestreq){PC(x); TC2(y,KC,KG); CSTR(y); K z=kb(zframe_streq(VSK(x), s)); R z;}
 Z K0(zframezerocopy){R krr("nyi");}
@@ -147,11 +147,11 @@ Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
 Z K2(zmsgpush){PC(x); PC(y); zmsg_push(VSK(x), VSK(y)); R(K)0;}
 Z K1(zmsgpop){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
 Z K2(zmsgadd){PC(x); PC(y); zmsg_add(VSK(x), VSK(y)); R(K)0;}
-Z K3(zmsgpushmem){x=y=z=(K)0; R krr("nyi");}//{zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
-Z K3(zmsgaddmem){x=y=z=(K)0; R krr("nyi");}//{zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
-Z K2(zmsgpushstr){x=y=(K)0; R krr("nyi");}//{CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
-Z K2(zmsgaddstr){x=y=(K)0; R krr("nyi");}//{CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
-Z K1(zmsgpopstr){x=(K)0; R krr("nyi");}//{R kp(zmsg_popstr(VSK(x)));}
+Z K0(zmsgpushmem){R krr("nyi");}//{zmsg_pushmem(VSK(x), VSK(y), N(z)); R(K)0;}
+Z K0(zmsgaddmem){R krr("nyi");}//{zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
+Z K0(zmsgpushstr){R krr("nyi");}//{CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
+Z K0(zmsgaddstr){R krr("nyi");}//{CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
+Z K0(zmsgpopstr){R krr("nyi");}//{R kp(zmsg_popstr(VSK(x)));}
 Z K2(zmsgwrap){PC(x); PC(y); zmsg_wrap(VSK(x), VSK(y));R(K)0;}
 Z K1(zmsgunwrap){PC(x); R ptr(zmsg_unwrap(VSK(x)));}
 Z K2(zmsgremove){PC(x); PC(y); zmsg_remove(VSK(x), VSK(y)); R(K)0;}
@@ -161,8 +161,8 @@ Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("emp
 Z K2(zmsgsave){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R ki(rc);}
 Z K2(zmsgload){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 //TODO(hjh): use kdb for saving/loading
-Z K2(zmsgencode){x=y=(K)0; R krr("nyi");}//{R kj(zmsg_encode(VSK(x), VSK(y)));}
-Z K2(zmsgdecode){x=y=(K)0; R krr("nyi");}//{R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
+Z K0(zmsgencode){R krr("nyi");}//{R kj(zmsg_encode(VSK(x), VSK(y)));}
+Z K0(zmsgdecode){R krr("nyi");}//{R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
 Z K1(zmsgdup){PC(x); zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
 Z K1(zmsgdump){PC(x); zmsg_dump(VSK(x)); R(K)0;}
 Z K1(zmsgtest){R ki(zmsg_test(xg));}
@@ -179,7 +179,7 @@ Z K1(zsocketswap){PC(x); R ki(zsocket_swap(VSK(x)));}
 Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
 Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
-        if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
+        if(r==0){id=kpn(s,n); free(s); R r1(id);}else{free(s); R KRR(errno);}}
         else{R krr("malloc");}} 
 Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
 Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
@@ -231,7 +231,7 @@ Z K1(zsocketrcvhwm){PC(x); R ki(zsocket_rcvhwm(VSK(x)));}
 Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
 Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
-        if(r==0){id=kpn(s,n); free(s); R r1(id);}else{R KRR(errno);}}
+        if(r==0){id=kpn(s,n); free(s); R r1(id);}else{free(s); R KRR(errno);}}
         else{R krr("malloc");}} 
 Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
 Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
@@ -330,8 +330,8 @@ Z czmqzpi zctxapi[]={
     {"zctx", "set_linger", zctxsetlinger, 2, "sets y milliseconds (-6h) to flush zsockets in the zctx x (-7h)."},
     {"zctx", "set_hwm", zctxsethwm, 2, "sets HWM value y (-6h) for the zctx x (-7h)."},
     {"zctx", "get_hwm", zctxgethwm, 1, "returns HWM value (-6h) for the zctx x (-7h)."},
-    {"zctx", "interrupted", zctxinterrupted, 1, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise"},
-    {"zctx", "underlying", zctxunderlying, 1, "nyi"},
+    {"zctx", "interrupted", zctxinterrupted, 0, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise"},
+    {"zctx", "underlying", zctxunderlying, 0, "nyi."},
     {"zctx", "test", zctxtest, 1, "zctx self test"},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
@@ -343,15 +343,15 @@ Z czmqzpi zfileapi[]={
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zframeapi[]={
     {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x; returns nothing on failure."},
-    {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi"},
+    {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi."},
     {"zframe", "destroy", zframedestroy, 1, "destroys the zframe x (-7h)."},
     {"zframe", "recv", zframerecv, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h)."},
     {"zframe", "recvnowait", zframerecvnowait, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h) without waiting."},
     {"zframe", "send", zframesend, 3, "sends the zframe x (-7h) to the zsocket y (-7h) with flag (-6h); returns non-zero on failure (-6h)."},
     {"zframe", "size", zframesize, 1, "returns the byte count (-7h) of the zframe x (-7h)."},
-    {"zframe", "data", zframedata, 1, "nyi."},
+    {"zframe", "data", zframedata, 0, "nyi."},
     {"zframe", "dup", zframedup, 1, "returns a duplicate (-7h) of the zframe x (-7h)."},
-    {"zframe", "strhex", zframestrhex, 1, "nyi."},
+    {"zframe", "strhex", zframestrhex, 0, "nyi."},
     {"zframe", "strdup", zframestrdup, 1, "returns a 10h of the zframe x's data."},
     {"zframe", "streq", zframestreq, 2, "returns whether the body of zframe x=y (10h)."},
     {"zframe", "zero_copy", zframezerocopy, 0, "nyi."},
@@ -382,10 +382,10 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "push", zmsgpush, 2, "pushes the zframe y (-7h) to the front of the zmsg x (-7h)."},
     {"zmsg", "pop", zmsgpop, 1, "pops the zframe y (-7h) from the front of the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "add", zmsgadd, 2, "adds the zframe y (-7h) to the end of the zmsg x (-7h)."},
-    {"zmsg", "pushmem", zmsgpushmem, 3, "nyi."},
-    {"zmsg", "addmem", zmsgaddmem, 3, "nyi."},
-    {"zmsg", "pushstr", zmsgpushstr, 2, "nyi."},
-    {"zmsg", "addstr", zmsgaddstr, 2, "nyi."},
+    {"zmsg", "pushmem", zmsgpushmem, 0, "nyi."},
+    {"zmsg", "addmem", zmsgaddmem, 0, "nyi."},
+    {"zmsg", "pushstr", zmsgpushstr, 0, "nyi."},
+    {"zmsg", "addstr", zmsgaddstr, 0, "nyi."},
     {"zmsg", "popstr", zmsgpopstr, 1, "nyi."},
     {"zmsg", "wrap", zmsgwrap, 2, ""},
     {"zmsg", "unwrap", zmsgunwrap, 1, ""},
@@ -395,8 +395,8 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "last", zmsglast, 1, "returns the last zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "save", zmsgsave, 2, "saves the zmsg x (-7h) to the file y (11h)."},
     {"zmsg", "load", zmsgload, 2, "loads the file y (11h) into the zmsg x (-7h)"},
-    {"zmsg", "encode", zmsgencode, 2, "nyi."},
-    {"zmsg", "decode", zmsgdecode, 2, "nyi."},
+    {"zmsg", "encode", zmsgencode, 0, "nyi."},
+    {"zmsg", "decode", zmsgdecode, 0, "nyi."},
     {"zmsg", "dup", zmsgdup, 1, "returns a duplicate of zmsg x."},
     {"zmsg", "dump", zmsgdump, 1, "dumps the content of zmsg x."},
     {"zmsg", "test", zmsgtest, 1, ""},
