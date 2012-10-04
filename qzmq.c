@@ -344,7 +344,7 @@ Z czmqzpi zframeapi[]={
     {"zframe", "strdup", zframestrdup, 1, "returns a 10h of the zframe x's data."},
     {"zframe", "streq", zframestreq, 2, "returns whether the body of zframe x=y (10h)."},
     {"zframe", "zero_copy", zframezerocopy, 0, "nyi."},
-    {"zframe", "more", zframemore, 1, "returns the zframe x's 'more property (-6h)."},
+    {"zframe", "more", zframemore, 1, "returns the zframe x's more property (-6h)."},
     {"zframe", "eq", zframeeq, 2, "returns 1b if x=y, 0b otherwise for the zframes x and y (-7h)."},
     {"zframe", "print", zframeprint, 2, "prints content of the zframe x (-7h) prefixed by y (10h) to stderr."},
     {"zframe", "reset", zframereset, 2, "resets the zframe x (-7h) with the new data y."},
@@ -373,7 +373,7 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "addmem", zmsgaddmem, 0, "nyi."},
     {"zmsg", "pushstr", zmsgpushstr, 0, "nyi."},
     {"zmsg", "addstr", zmsgaddstr, 0, "nyi."},
-    {"zmsg", "popstr", zmsgpopstr, 1, "nyi."},
+    {"zmsg", "popstr", zmsgpopstr, 0, "nyi."},
     {"zmsg", "wrap", zmsgwrap, 0, "nyi."},
     {"zmsg", "unwrap", zmsgunwrap, 0, "nyi."},
     {"zmsg", "remove", zmsgremove, 0, "nyi."},
@@ -499,7 +499,7 @@ Z czmqzpi zthreadapi[] = {
     {NULL,NULL,NULL,0,NULL},};
 Z czmqzpi libzmqapi[] = {
     {"libzmq", "version", version, 0, "returns major, minor, patch version numbers (6h) of libzmq."},
-    {"libzmq", "device", device, 3, ""},
+    {"libzmq", "device", device, 3, "sets a zmq_device for zctx x (-7h), zsocket-frontend y (-7h) and -backend z (-7h). [c.f. man zmq_device]"},
     {NULL,NULL,NULL,0,NULL}};
 
 // if argc==0, set it to 1 otherwise 'rank
