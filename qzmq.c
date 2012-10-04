@@ -316,12 +316,12 @@ Z czmqzpi zclockapi[]={
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zctxapi[]={
     {"zctx", "new", zctxnew, 0, "creates and returns a new zctx (-7h)."},
-    {"zctx", "destroy", zctxdestroy, 1, "destroys the zctx x (-7h)"},
-    {"zctx", "set_iothreads", zctxsetiothreads, 2, "sets number of threads for the zctx x (-7h) to be y (-6h)"},
+    {"zctx", "destroy", zctxdestroy, 1, "destroys the zctx x (-7h)."},
+    {"zctx", "set_iothreads", zctxsetiothreads, 2, "sets number of threads for the zctx x (-7h) to be y (-6h)."},
     {"zctx", "set_linger", zctxsetlinger, 2, "sets y milliseconds (-6h) to flush zsockets in the zctx x (-7h)."},
     {"zctx", "set_hwm", zctxsethwm, 2, "sets HWM value y (-6h) for the zctx x (-7h)."},
     {"zctx", "get_hwm", zctxgethwm, 1, "returns HWM value (-6h) for the zctx x (-7h)."},
-    {"zctx", "interrupted", zctxinterrupted, 0, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise"},
+    {"zctx", "interrupted", zctxinterrupted, 0, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise."},
     {"zctx", "underlying", zctxunderlying, 0, "nyi."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
@@ -334,7 +334,7 @@ Z czmqzpi zframeapi[]={
     {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x (10h, 4h); returns nothing on failure."},
     {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi."},
     {"zframe", "destroy", zframedestroy, 1, "destroys the zframe x (-7h)."},
-    {"zframe", "recv", zframerecv, 1, "receives and returns a zframe (-7h) from the zsocket x (-7h)."},
+    {"zframe", "recv", zframerecv, 1, "receives, then returns the zframe (-7h) from the zsocket x (-7h)."},
     {"zframe", "recvnowait", zframerecvnowait, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h) without waiting."},
     {"zframe", "send", zframesend, 3, "sends the zframe x (-7h) to the zsocket y (-7h) with flag (-6h); returns non-zero on failure (-6h)."},
     {"zframe", "size", zframesize, 1, "returns the byte count (-7h) of the zframe x (-7h)."},
@@ -355,15 +355,15 @@ Z czmqzpi zloopapi[]={
     {"zloop", "poller", zlooppoller, 4, "registers pollitem y (-7h) with the zloop x (-7h); the handler z is called with z4 when y is ready; returns 0i if there is no error, -1i otherwise."},
     {"zloop", "poller_end", zlooppollerend, 2, "cancels the pollitem y (-7h) from the zloop x (-7h)."},
     {"zloop", "timer", zlooptimer, 5, "registers a timer."},
-    {"zloop", "timer_end", zlooptimerend, 2, "cancels all timers for the zloop x and y."},
+    {"zloop", "timer_end", zlooptimerend, 2, "cancels all timers for the zloop x (-7h) and y."},
     {"zloop", "set_verbose", zloopsetverbose, 2, "verbose tracing of the zloop x (-7h) to y, 1b or 0b."},
     {"zloop", "start", zloopstart, 1, "starts zloop x; returns 0i if interrupted, -1i if cancelled by a handler."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zmsgapi[]={
     {"zmsg", "new", zmsgnew, 0, "creates a new empty zmsg."},
-    {"zmsg", "destroy", zmsgdestroy, 1, "destroys a zmsg x."},
-    {"zmsg", "recv", zmsgrecv, 1, "receives a zmsg from zsocket x."},
-    {"zmsg", "send", zmsgsend, 2, "sends a zmsg x to zsocket y."},
+    {"zmsg", "destroy", zmsgdestroy, 1, "destroys the zmsg x."},
+    {"zmsg", "recv", zmsgrecv, 1, "receives the zmsg from zsocket x."},
+    {"zmsg", "send", zmsgsend, 2, "sends the zmsg x to the zsocket y."},
     {"zmsg", "size", zmsgsize, 1, "returns number of zframes in zmsg x."},
     {"zmsg", "content_size", zmsgcontentsize, 1, "returns combined size of all zframes in zmsg x."},
     {"zmsg", "push", zmsgpush, 2, "pushes the zframe y (-7h) to the front of the zmsg x (-7h)."},
@@ -499,7 +499,7 @@ Z czmqzpi zthreadapi[] = {
     {NULL,NULL,NULL,0,NULL},};
 Z czmqzpi libzmqapi[] = {
     {"libzmq", "version", version, 0, "returns major, minor, patch version numbers (6h) of libzmq."},
-    {"libzmq", "device", device, 3, "sets a zmq_device for zctx x (-7h), zsocket-frontend y (-7h) and -backend z (-7h). [c.f. man zmq_device]"},
+    {"libzmq", "device", device, 3, "sets a zmq_device for the zctx x (-7h), the zsocket frontend y (-7h) and the zsocket backend z (-7h). [c.f. man zmq_device]"},
     {NULL,NULL,NULL,0,NULL}};
 
 // if argc==0, set it to 1 otherwise 'rank
