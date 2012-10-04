@@ -57,7 +57,6 @@ Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}}
 Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
 Z K0(zclocktime){R(kj(zclock_time()));}
 Z K1(zclocklog){TC(x,KC); CSTR(x); zclock_log(s); R(K)0;}
-Z K1(zclocktest){R ki(zclock_test(xg));}
 
 Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
 Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
@@ -67,14 +66,12 @@ Z K2(zctxsethwm){PC(x); TC(y,-KI); zctx_set_hwm(VSK(x), yi); R(K)0;}
 Z K1(zctxgethwm){PC(x); R ki(zctx_hwm(VSK(x)));}
 Z K0(zctxinterrupted){R kb(zctx_interrupted);}
 Z K0(zctxunderlying){R krr("nyi");}
-Z K1(zctxtest){R ki(zctx_test(xg));}
 
 // zfile `:path
 Z K1(zfiledelete){TC(x,-KS); R ki(zfile_delete(++xs));}
 Z K1(zfilemkdir){TC(x,-KS); R ki(zfile_mkdir(++xs));}
 Z K1(zfileexists){TC(x,-KS); R ki(zfile_exists(++xs));}
 Z K1(zfilesize){TC(x,-KS); R kj(zfile_size(++xs));}
-Z K1(zfiletest){R ki(zfile_test(xg));}
 
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
     if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, ptr(f)); R(K)0;}
@@ -95,7 +92,6 @@ Z K1(zframemore){PC(x); R ki(zframe_more(VSK(x)));}
 Z K2(zframeeq){PC(x); PC(y); R kb(zframe_eq(VSK(x), VSK(y)));}
 Z K2(zframeprint){TC(y,KC); CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
-Z K1(zframetest){R ki(zframe_test(xg));}
 
 static K eventfn;
 static K timerfn;
@@ -136,7 +132,6 @@ Z K1(zloopstart){PC(x);
     ZTK(zloop_t,loop);  
     I rc=zloop_start(loop);
     R ki(rc);}
-Z K1(zlooptest){R ki(zloop_test(xg));}
 
 Z K0(zmsgnew){zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
 Z K1(zmsgdestroy){PC(x); ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
@@ -165,7 +160,6 @@ Z K0(zmsgencode){R krr("nyi");}//{R kj(zmsg_encode(VSK(x), VSK(y)));}
 Z K0(zmsgdecode){R krr("nyi");}//{R ptr(zmsg_decode(VSK(x), N(y))); R(K)0;}
 Z K1(zmsgdup){PC(x); zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); R(K)0;}
 Z K1(zmsgdump){PC(x); zmsg_dump(VSK(x)); R(K)0;}
-Z K1(zmsgtest){R ki(zmsg_test(xg));}
 
 Z K2(zsocketnew){PC(x); TC(y,-KI); R ptr(zsocket_new(VSK(x), yi));}
 Z K2(zsocketdestroy){PC(x); PC(y); zsocket_destroy(VSK(x), VSK(y)); R(K)0;}
@@ -270,7 +264,6 @@ Z K2(zsocketsetipv4only){PC(x); TC(y,-KI); zsocket_set_ipv4only(VSK(x), yi); R(K
 Z K2(zsocketsetfailunroutable){PC(x); TC(y,-KI); zsocket_set_fail_unroutable(VSK(x), yi); R(K)0;}
 Z K2(zsocketsethwm){PC(x); TC(y,-KI); zsocket_set_hwm(VSK(x), yi); R(K)0;}
 #endif
-Z K1(zsockopttest){R ki(zsockopt_test(xg));}
 
 // send/receive q char vector (not for byte vectors or serialized objects)
 // zstr_recv* returns C string with a trailing \0. Convert it to q char vector and free the poor thing.
@@ -278,7 +271,6 @@ Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
 Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
 Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
 Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
-Z K1(zstrtest){R ki(zstr_test(xg));}
 
 static K attachedfn;
 static K detachedfn;
@@ -321,7 +313,6 @@ Z czmqzpi zclockapi[]={
     {"zclock", "sleep", zclocksleep, 1, "sleeps for x milliseconds (-6h)."},
     {"zclock", "time", zclocktime, 0, "returns the current timestamp in milliseconds (-7h)."},
     {"zclock", "log", zclocklog, 1, "prints YY-mm-dd, followed by x (10h)"},
-    {"zclock", "test", zclocktest, 1, "zclock self test"},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zctxapi[]={
     {"zctx", "new", zctxnew, 0, "creates and returns a new zctx (-7h)."},
@@ -332,14 +323,12 @@ Z czmqzpi zctxapi[]={
     {"zctx", "get_hwm", zctxgethwm, 1, "returns HWM value (-6h) for the zctx x (-7h)."},
     {"zctx", "interrupted", zctxinterrupted, 0, "returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise"},
     {"zctx", "underlying", zctxunderlying, 0, "nyi."},
-    {"zctx", "test", zctxtest, 1, "zctx self test"},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
     {"zfile", "delete", zfiledelete, 1, "deletes the file x (11h); returns 0i if successful, -1i otherwise."},
     {"zfile", "mkdir", zfilemkdir, 1, "makes directory named x (11h); returns 0i if successful, -1i otherwise."},
     {"zfile", "exists", zfileexists, 1, "returns 1i if the file x (11h) exists, 0i otherwise."},
     {"zfile", "size", zfilesize, 1, "returns the size (-7h) of the file x (11h)."},
-    {"zfile", "test", zfiletest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zframeapi[]={
     {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x; returns nothing on failure."},
@@ -359,7 +348,6 @@ Z czmqzpi zframeapi[]={
     {"zframe", "eq", zframeeq, 2, "returns 1b if x=y, 0b otherwise for the zframes x and y (-7h)."},
     {"zframe", "print", zframeprint, 2, "prints content of the zframe x (-7h) prefixed by y (10h) to stderr."},
     {"zframe", "reset", zframereset, 2, "resets the zframe x (-7h) with the new data y."},
-    {"zframe", "test", zframetest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zloopapi[]={
     {"zloop", "new", zloopnew, 0, "creates the new zloop x (-7h)."},
@@ -370,7 +358,6 @@ Z czmqzpi zloopapi[]={
     {"zloop", "timer_end", zlooptimerend, 2, "cancels all timers for the zloop x and y."},
     {"zloop", "set_verbose", zloopsetverbose, 2, "verbose tracing of the zloop x (-7h) to y, 1b or 0b."},
     {"zloop", "start", zloopstart, 1, "starts zloop x; returns 0i if interrupted, -1i if cancelled by a handler."},
-    {"zloop", "test", zlooptest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zmsgapi[]={
     {"zmsg", "new", zmsgnew, 0, "creates a new empty zmsg."},
@@ -399,7 +386,6 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "decode", zmsgdecode, 0, "nyi."},
     {"zmsg", "dup", zmsgdup, 1, "returns a duplicate of zmsg x."},
     {"zmsg", "dump", zmsgdump, 1, "dumps the content of zmsg x."},
-    {"zmsg", "test", zmsgtest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsocketapi[]={
     {"zsocket", "new", zsocketnew, 2, "returns a new zsocket of type y for zctx x."},
@@ -500,14 +486,12 @@ Z czmqzpi zsockoptapi[]={
     {"zsockopt", "set_failunroutable", zsocketsetfailunroutable, 2, ""},
     {"zsockopt", "set_hwm", zsocketsethwm, 2, ""},
 #endif
-    {"zsockopt", "test", zsockopttest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zstrapi[]={
     {"zstr", "recv", zstrrecv, 1, "returns a 10h received from the zsocket x (-7h)."},
     {"zstr", "recv_nowait", zstrrecvnowait, 1, "returns a 10h received from the zsocket x (-7h) without waiting."},
     {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x (-7h)."},
     {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x (-7h) with MORE flag."},
-    {"zstr", "test", zstrtest, 1, ""},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
     {"zthread", "new", zthreadnew, 2, "creates a detached thread with the function x and arguments y."},
