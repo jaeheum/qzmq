@@ -326,15 +326,15 @@ Z czmqzpi zctxapi[]={
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
     {"zfile", "delete", zfiledelete, 1, "deletes the file x (11h); returns 0i if successful, -1i otherwise."},
-    {"zfile", "mkdir", zfilemkdir, 1, "makes directory named x (11h); returns 0i if successful, -1i otherwise."},
+    {"zfile", "mkdir", zfilemkdir, 1, "makes a directory named x (11h); returns 0i if successful, -1i otherwise."},
     {"zfile", "exists", zfileexists, 1, "returns 1i if the file x (11h) exists, 0i otherwise."},
     {"zfile", "size", zfilesize, 1, "returns the size (-7h) of the file x (11h)."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zframeapi[]={
-    {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x; returns nothing on failure."},
+    {"zframe", "new", zframenew, 1, "creates and returns a new zframe (-7h) from x (10h, 4h); returns nothing on failure."},
     {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi."},
     {"zframe", "destroy", zframedestroy, 1, "destroys the zframe x (-7h)."},
-    {"zframe", "recv", zframerecv, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h)."},
+    {"zframe", "recv", zframerecv, 1, "receives and returns a zframe (-7h) from the zsocket x (-7h)."},
     {"zframe", "recvnowait", zframerecvnowait, 1, "receives and returns the zframe (-7h) from the zsocket x (-7h) without waiting."},
     {"zframe", "send", zframesend, 3, "sends the zframe x (-7h) to the zsocket y (-7h) with flag (-6h); returns non-zero on failure (-6h)."},
     {"zframe", "size", zframesize, 1, "returns the byte count (-7h) of the zframe x (-7h)."},
@@ -345,8 +345,8 @@ Z czmqzpi zframeapi[]={
     {"zframe", "streq", zframestreq, 2, "returns whether the body of zframe x=y (10h)."},
     {"zframe", "zero_copy", zframezerocopy, 0, "nyi."},
     {"zframe", "more", zframemore, 1, "returns the zframe x's more property (-6h)."},
-    {"zframe", "eq", zframeeq, 2, "returns 1b if x=y, 0b otherwise for the zframes x and y (-7h)."},
-    {"zframe", "print", zframeprint, 2, "prints content of the zframe x (-7h) prefixed by y (10h) to stderr."},
+    {"zframe", "eq", zframeeq, 2, "returns 1b if zframes x=y (-7h), 0b otherwise."},
+    {"zframe", "print", zframeprint, 2, "prints the content of the zframe x (-7h) prefixed by y (10h) to stderr."},
     {"zframe", "reset", zframereset, 2, "resets the zframe x (-7h) with the new data y."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zloopapi[]={
@@ -388,11 +388,11 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "dump", zmsgdump, 1, "dumps the content of zmsg x."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsocketapi[]={
-    {"zsocket", "new", zsocketnew, 2, "returns a new zsocket of type y for zctx x."},
-    {"zsocket", "destroy", zsocketdestroy, 2, "destroys a zsocket y for zctx x."},
-    {"zsocket", "bind", zsocketbind, 2, "binds zsocket x to URL y."},
-    {"zsocket", "connect", zsocketconnect, 2, "connects zsockt x to URL y"},
-    {"zsocket", "type_sym", zsockettypestr, 1, "prints do.it "},
+    {"zsocket", "new", zsocketnew, 2, "returns the new zsocket (-7h) of type y for the zctx x (-7h)."},
+    {"zsocket", "destroy", zsocketdestroy, 2, "destroys the zsocket y (-7h) for the zctx x (-7h)."},
+    {"zsocket", "bind", zsocketbind, 2, "binds zsocket x (-7h) to URL y."},
+    {"zsocket", "connect", zsocketconnect, 2, "connects zsocket x (-7h) to URL y (-11h)"},
+    {"zsocket", "type_sym", zsockettypestr, 1, "prints the symbolic type name (-11h) of the zsocket x (-7h). (N.B. czmq type_str())"},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsockoptapi[]={
 #if (ZMQ_VERSION_MAJOR == 2)
