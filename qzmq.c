@@ -147,9 +147,9 @@ Z K0(zmsgaddmem){R krr("nyi");}//{zmsg_addmem(VSK(x), VSK(y), N(z)); R(K)0;}
 Z K0(zmsgpushstr){R krr("nyi");}//{CSTR(y); zmsg_pushstr(VSK(x), s); R(K)0;}
 Z K0(zmsgaddstr){R krr("nyi");}//{CSTR(y); zmsg_addstr(VSK(x), s); R(K)0;}
 Z K0(zmsgpopstr){R krr("nyi");}//{R kp(zmsg_popstr(VSK(x)));}
-Z K2(zmsgwrap){PC(x); PC(y); zmsg_wrap(VSK(x), VSK(y));R(K)0;}
-Z K1(zmsgunwrap){PC(x); R ptr(zmsg_unwrap(VSK(x)));}
-Z K2(zmsgremove){PC(x); PC(y); zmsg_remove(VSK(x), VSK(y)); R(K)0;}
+Z K0(zmsgwrap){R krr("nyi");}//{PC(x); PC(y); zmsg_wrap(VSK(x), VSK(y));R(K)0;}
+Z K0(zmsgunwrap){R krr("nyi");}//{PC(x); R ptr(zmsg_unwrap(VSK(x)));}
+Z K0(zmsgremove){R krr("nyi");}//{PC(x); PC(y); zmsg_remove(VSK(x), VSK(y)); R(K)0;}
 Z K1(zmsgfirst){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
 Z K1(zmsgnext){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
 Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
@@ -374,9 +374,9 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "pushstr", zmsgpushstr, 0, "nyi."},
     {"zmsg", "addstr", zmsgaddstr, 0, "nyi."},
     {"zmsg", "popstr", zmsgpopstr, 1, "nyi."},
-    {"zmsg", "wrap", zmsgwrap, 2, ""},
-    {"zmsg", "unwrap", zmsgunwrap, 1, ""},
-    {"zmsg", "remove", zmsgremove, 1, ""},
+    {"zmsg", "wrap", zmsgwrap, 0, "nyi."},
+    {"zmsg", "unwrap", zmsgunwrap, 0, "nyi."},
+    {"zmsg", "remove", zmsgremove, 0, "nyi."},
     {"zmsg", "first", zmsgfirst, 1, "returns the first zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "next", zmsgnext, 1, "returns the next zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
     {"zmsg", "last", zmsglast, 1, "returns the last zframe (-7h) from the zmsg x (-7h) or raises 'empty."},
