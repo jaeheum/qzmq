@@ -504,6 +504,7 @@ Z czmqzpi libzmqapi[] = {
 
 // if argc==0, set it to 1 otherwise 'rank
 #define APITAB(fnname,fn,argc) xS[i]=ss(fnname);kK(y)[i]=dl(fn,argc>0?argc:1)
+// notice the -1 for the NULL sentinals in *api[]
 #define EXPAPI(name) K1(name){int n=tblsize(name##api)-1; K y=ktn(0,n);x=ktn(KS,n); \
     DO(n, APITAB(name##api[i].fnname, name##api[i].fn, name##api[i].argc)); \
     R xD(x,y);}
