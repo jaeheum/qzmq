@@ -315,7 +315,7 @@ Z czmqzpi zclockapi[]={
     {"zclock", "log", zclocklog, 1, "prints YY-mm-dd, followed by x (10h)."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zctxapi[]={
-    {"zctx", "new", zctxnew, 0, "creates and returns a new zctx."},
+    {"zctx", "new", zctxnew, 0, "creates a new zctx."},
     {"zctx", "destroy", zctxdestroy, 1, "destroys the zctx x."},
     {"zctx", "set_iothreads", zctxsetiothreads, 2, "sets number of threads for the zctx x to be y (-6h)."},
     {"zctx", "set_linger", zctxsetlinger, 2, "sets y milliseconds (-6h) to flush zsockets in the zctx x."},
@@ -325,18 +325,18 @@ Z czmqzpi zctxapi[]={
     {"zctx", "underlying", zctxunderlying, 0, "nyi."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zfileapi[]={
-    {"zfile", "delete", zfiledelete, 1, "deletes the `:file x; returns 0i if successful, -1i otherwise."},
-    {"zfile", "mkdir", zfilemkdir, 1, "makes a `:directory named x; returns 0i if successful, -1i otherwise."},
-    {"zfile", "exists", zfileexists, 1, "returns 1i if the `:file x exists, 0i otherwise."},
+    {"zfile", "delete", zfiledelete, 1, "deletes the `:file x; returns 0i OK, -1i not."},
+    {"zfile", "mkdir", zfilemkdir, 1, "makes a `:directory x; returns 0i OK, -1i not."},
+    {"zfile", "exists", zfileexists, 1, "returns 1i if the `:file x exists, 0i not."},
     {"zfile", "size", zfilesize, 1, "returns the size (-7h) of the `:file x."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zframeapi[]={
-    {"zframe", "new", zframenew, 1, "creates and returns a new zframe from x (10h|4h); returns nothing on failure."},
+    {"zframe", "new", zframenew, 1, "creates a new zframe from x (10h|4h); returns nothing on failure."},
     {"zframe", "new_zero_copy", zframenewzerocopy, 0, "nyi."},
     {"zframe", "destroy", zframedestroy, 1, "destroys the zframe x."},
     {"zframe", "recv", zframerecv, 1, "receives, returns the zframe from the zsocket x."},
     {"zframe", "recvnowait", zframerecvnowait, 1, "receives, returns the zframe from the zsocket x without waiting."},
-    {"zframe", "send", zframesend, 3, "sends the zframe x to the zsocket y with flag z (-6h); returns non-zero on failure (-6h)."},
+    {"zframe", "send", zframesend, 3, "sends the zframe x to the zsocket y with flag z (-6h); fails non-zero."},
     {"zframe", "size", zframesize, 1, "returns the byte count of the zframe x."},
     {"zframe", "data", zframedata, 0, "nyi."},
     {"zframe", "dup", zframedup, 1, "returns a duplicate of the zframe x."},
@@ -352,7 +352,7 @@ Z czmqzpi zframeapi[]={
 Z czmqzpi zloopapi[]={
     {"zloop", "new", zloopnew, 0, "creates a new zloop."},
     {"zloop", "destroy", zloopdestroy, 1, "destroys the zloop x."},
-    {"zloop", "poller", zlooppoller, 4, "registers pollitem y with the zloop x; the handler z (-11h) is called with z4 when y is ready; returns 0i if there is no error, -1i otherwise."},
+    {"zloop", "poller", zlooppoller, 4, "registers pollitem y with the zloop x; the handler z (-11h) is called with z4 when y is ready; returns 0i OK, -1i not."},
     {"zloop", "poller_end", zlooppollerend, 2, "cancels the pollitem y from the zloop x."},
     // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
     {"zloop", "timer", zlooptimer, 5, "registers a timer to the zloop x, with the delay y, the repetitions z, the handler z4 (-11h), and the arguments z5. see `zloop for a full documentation."},
@@ -389,10 +389,10 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "dump", zmsgdump, 1, "dumps the content of the zmsg x to stderr."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsocketapi[]={
-    {"zsocket", "new", zsocketnew, 2, "returns the new zsocket of the zmq socket option y (-6h) for the zctx x."},
+    {"zsocket", "new", zsocketnew, 2, "creates the new zsocket of the zmq socket option y (-6h) for the zctx x."},
     {"zsocket", "destroy", zsocketdestroy, 2, "destroys the zsocket y for the zctx x."},
-    {"zsocket", "bind", zsocketbind, 2, "binds the zsocket x to the `transport://endpoint y; returns the bound port number (-6h)."},
-    {"zsocket", "connect", zsocketconnect, 2, "connects the zsocket x to the `transport://endpoint y; returns 0i if successul, -1i otherwise."},
+    {"zsocket", "bind", zsocketbind, 2, "binds the zsocket x to `transport://endpoint y; returns the port (-6h)."},
+    {"zsocket", "connect", zsocketconnect, 2, "connects the zsocket x and `transport://endpoint y; 0i OK, -1i not."},
     {"zsocket", "type_sym", zsockettypestr, 1, "prints the `option of the zsocket x. (N.B. czmq type_str())"},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zsockoptapi[]={
@@ -495,12 +495,12 @@ Z czmqzpi zstrapi[]={
     {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x with MORE flag."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
-    {"zthread", "new", zthreadnew, 2, "creates a detached thread running the function x (-11h) with the argument y."},
-    {"zthread", "fork", zthreadfork, 3, "creates an attached thread running the function y (-11h) with the argument z in the zctx x."},
+    {"zthread", "new", zthreadnew, 2, "creates a detached thread running x[y]."},
+    {"zthread", "fork", zthreadfork, 3, "creates an attached thread running y[z] in the zctx x."},
     {NULL,NULL,NULL,0,NULL},};
 Z czmqzpi libzmqapi[] = {
     {"libzmq", "version", version, 0, "returns major, minor, patch version numbers (6h) of libzmq."},
-    {"libzmq", "device", device, 3, "sets a zmq_device for the zctx x, the frontend y and the backend z, both zsocket. see 'man zmq_device'"},
+    {"libzmq", "device", device, 3, "sets a zmq_device for the zctx x, the zsockets y, z. see 'man zmq_device'"},
     {NULL,NULL,NULL,0,NULL}};
 
 // if argc==0, set it to 1 otherwise 'rank
@@ -532,13 +532,13 @@ K0(makedoc){
     C s[40]; C see[100]; I i,j;
     K key,kc,kd, val, vc, argz, docstrings;
     kc=ktn(KS,1); kS(kc)[0]=ss("name"); kd=ktn(KS,0);
-    vc=ktn(KS,2); kS(vc)[0]=ss("args"); kS(vc)[1]=ss("docstring");
+    vc=ktn(KS,2); kS(vc)[0]=ss("args"); kS(vc)[1]=ss("doc");
     argz=ktn(KS,0); docstrings=ktn(KS,0);
     // special cases for qzmq, czmq, zmq(3) and zsockopt(7); zhash and zlist are not included in qzmq.
     js(&kd, ss("qzmq")); js(&argz, ss("")); js(&docstrings, ss("see https://github.com/jaeheum/qzmq/blob/master/README.md."));
     js(&kd, ss("czmq")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org or 'man czmq'."));
-    js(&kd, ss("zmq")); js(&argz, ss("")); js(&docstrings, ss("keys/values of zmq (99h) match 'zmq.h', 'man zmq_socket', 'man zmq_getsockopt', `zsockopt and `zsocket.type_sym."));
-    js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt'. see also `zmq and `zsocket.type_sym."));
+    js(&kd, ss("zmq")); js(&argz, ss("")); js(&docstrings, ss("see 'zmq.h', 'man zmq_socket', 'man zmq_getsockopt', `zsockopt and `zsocket.type_sym."));
+    js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt'. see also `zmq."));
     js(&kd, ss("zhash")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
     js(&kd, ss("zlist")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
     for(i=0; i < (int)tblsize(apis); i++) {
