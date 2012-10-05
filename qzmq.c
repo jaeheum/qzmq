@@ -269,8 +269,8 @@ Z K2(zsocketsethwm){PC(x); TC(y,-KI); zsocket_set_hwm(VSK(x), yi); R(K)0;}
 // zstr_recv* returns C string with a trailing \0. Convert it to q char vector and free the poor thing.
 Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
 Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
-Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_send(VSK(x), s); R rc==0?y:(K)0;}
-Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); I rc=zstr_sendm(VSK(x), s); R rc==0?y:(K)0;}
+Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_send(VSK(x), s));}
+Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_sendm(VSK(x), s));}
 
 static K attachedfn;
 static K detachedfn;
@@ -491,8 +491,8 @@ Z czmqzpi zsockoptapi[]={
 Z czmqzpi zstrapi[]={
     {"zstr", "recv", zstrrecv, 1, "returns a 10h received from the zsocket x."},
     {"zstr", "recv_nowait", zstrrecvnowait, 1, "returns a 10h received from the zsocket x without waiting."},
-    {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x."},
-    {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x with MORE flag."},
+    {"zstr", "send", zstrsend, 2, "sends y (10h) to the zsocket x; 0i OK, -1i not."},
+    {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x with MORE flag; 0i OK, -1i not."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
     {"zthread", "new", zthreadnew, 2, "creates a detached thread running x[y]."},

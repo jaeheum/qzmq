@@ -119,8 +119,8 @@ domain:"localhost"
 port:zsocket.bind[writer; `$"tcp://",interf,":",string service]
 if[port<>service; '`fail]
 port:zsocket.connect[reader; `$"tcp://",domain,":",string service]
-s:zstr.send[writer; "HELLO"]; if[max[s<>"HELLO"]; '`fail]
-s1:zstr.send[writer; "1"]; if[max[s1<>"1"]; '`fail]
+rc:zstr.send[writer; "HELLO"]; if[rc<>0i; '`fail]
+rc:zstr.send[writer; "1"]; if[rc<>0i; '`fail]
 msg:zstr.recv[reader]
 0N!msg
 port:zsocket.bind[writer; `$"tcp://",interf,":*"]
@@ -194,7 +194,7 @@ zclock.sleep 100i
 /attached thread
 pong:{[args;ctx;pipe] zsocket.new[ctx; zmq.PUSH]; zstr.recv[pipe]; zstr.send[pipe; "pong"]}
 pipe:zthread.fork[ctx; `pong; 0N]
-ping:zstr.send[pipe; "ping"]; if[max[ping<>"ping"]; '`fail]
+ping:zstr.send[pipe; "ping"]; if[ping<>0i; '`fail]
 result:zstr.recv[pipe]
 if[max result<>"pong"; '`fail]
 zctx.destroy[ctx]
