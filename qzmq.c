@@ -352,10 +352,10 @@ Z czmqzpi zframeapi[]={
 Z czmqzpi zloopapi[]={
     {"zloop", "new", zloopnew, 0, "creates a new zloop."},
     {"zloop", "destroy", zloopdestroy, 1, "destroys the zloop x."},
-    {"zloop", "poller", zlooppoller, 4, "registers pollitem y with the zloop x; the handler z (-11h) is called with z4 when y is ready; returns 0i OK, -1i not."},
+    {"zloop", "poller", zlooppoller, 4, "`z[z4] runs when the pollitem y is ready in the zloop x; 0i OK, -1i not."},
     {"zloop", "poller_end", zlooppollerend, 2, "cancels the pollitem y from the zloop x."},
     // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
-    {"zloop", "timer", zlooptimer, 5, "registers a timer to the zloop x, with the delay y, the repetitions z, the handler z4 (-11h), and the arguments z5. see `zloop for a full documentation."},
+    {"zloop", "timer", zlooptimer, 5, "`z4[z5] runs with the delay y, z-times in the zloop x; 0i OK, -1i not."},
     {"zloop", "timer_end", zlooptimerend, 2, "cancels all timers for the zloop x and y."},
     {"zloop", "set_verbose", zloopsetverbose, 2, "verbose tracing of the zloop x to y, 1b or 0b."},
     {"zloop", "start", zloopstart, 1, "starts zloop x; returns 0i if interrupted, -1i if cancelled by a handler."},
@@ -537,8 +537,8 @@ K0(makedoc){
     // special cases for qzmq, czmq, zmq(3) and zsockopt(7); zhash and zlist are not included in qzmq.
     js(&kd, ss("qzmq")); js(&argz, ss("")); js(&docstrings, ss("see https://github.com/jaeheum/qzmq/blob/master/README.md."));
     js(&kd, ss("czmq")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org or 'man czmq'."));
-    js(&kd, ss("zmq")); js(&argz, ss("")); js(&docstrings, ss("see 'zmq.h', 'man zmq_socket', 'man zmq_getsockopt', `zsockopt and `zsocket.type_sym."));
-    js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt'. see also `zmq."));
+    js(&kd, ss("zmq")); js(&argz, ss("")); js(&docstrings, ss("see zmq, czmq z* api man pages, `zsockopt and `zsocket.type_sym."));
+    js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt' and `zmq."));
     js(&kd, ss("zhash")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
     js(&kd, ss("zlist")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
     for(i=0; i < (int)tblsize(apis); i++) {
