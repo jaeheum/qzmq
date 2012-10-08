@@ -112,6 +112,20 @@ Load qzmq; learn to read online documentation; write multi-threading code in q; 
     12-10-05 23:31:22 tid7
     12-10-05 23:31:22 tid8
     q)12-10-05 23:31:22 tid9
+    q) / check there are ten threads under q on a linux machine
+    q)\pstree
+    "init-+-atd"
+    "     |-auditd---{auditd}"
+    "     |-crond"
+    "     |-dbus-daemon"
+    "     |-2*[dhclient]"
+    "     |-6*[mingetty]"
+    "     |-ntpd"
+    "     |-rsyslogd---2*[{rsyslogd}]"
+    "     |-sshd---sshd---sshd---bash---q-+-sh---pstree"
+    "     |                               `-10*[{q}]"
+    "     `-udevd"
+    q) / check there are ten threads under q on a mac os x
     q)\ps -o ppid -M
     " PPID USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND"
     "  349 hjh    171 s000    0.0 S    31T   0:00.03   0:00.02 rlwrap /Users/hjh/..
