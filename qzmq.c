@@ -495,8 +495,8 @@ Z czmqzpi zstrapi[]={
     {"zstr", "sendm", zstrsendm, 2, "sends y (10h) to the zsocket x with MORE flag; 0i OK, -1i not."},
     {NULL,NULL,NULL,0,NULL}};
 Z czmqzpi zthreadapi[] = {
-    {"zthread", "new", zthreadnew, 2, "creates a detached thread running x[y]."},
-    {"zthread", "fork", zthreadfork, 3, "creates an attached thread running y[z] in the zctx x."},
+    {"zthread", "new", zthreadnew, 2, "creates a detached thread running `x[y]."},
+    {"zthread", "fork", zthreadfork, 3, "creates an attached thread running `y[z] in the zctx x."},
     {NULL,NULL,NULL,0,NULL},};
 Z czmqzpi libzmqapi[] = {
     {"libzmq", "version", version, 0, "returns major, minor, patch version numbers (6h) of libzmq."},
