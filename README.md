@@ -17,9 +17,9 @@ qzmq is hosted at [github][qzmq] and it uses the [issue tracker][issues] for all
 &emsp;<a href="#toc2-29">Files of qzmq</a>
 &emsp;<a href="#toc2-40">Building qzmq</a>
 &emsp;<a href="#toc2-52">A Quick Tour of qzmq</a>
-&emsp;<a href="#toc2-145">A Longer Tour of qzmq</a>
-&emsp;<a href="#toc2-154">Issues</a>
-&emsp;<a href="#toc2-158"></a>
+&emsp;<a href="#toc2-159">A Longer Tour of qzmq</a>
+&emsp;<a href="#toc2-168">Issues</a>
+&emsp;<a href="#toc2-172"></a>
 
 <A name="toc2-18" title="License" />
 ## License
@@ -123,6 +123,20 @@ Load qzmq; learn to read online documentation; write multi-threading code in q; 
     12-10-05 23:31:22 tid7
     12-10-05 23:31:22 tid8
     q)12-10-05 23:31:22 tid9
+    q) / check there are ten threads under q on a linux machine
+    q)\pstree
+    "init-+-atd"
+    "     |-auditd---{auditd}"
+    "     |-crond"
+    "     |-dbus-daemon"
+    "     |-2*[dhclient]"
+    "     |-6*[mingetty]"
+    "     |-ntpd"
+    "     |-rsyslogd---2*[{rsyslogd}]"
+    "     |-sshd---sshd---sshd---bash---q-+-sh---pstree"
+    "     |                               `-10*[{q}]"
+    "     `-udevd"
+    q) / check there are ten threads under q on a mac os x
     q)\ps -o ppid -M
     " PPID USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND"
     "  349 hjh    171 s000    0.0 S    31T   0:00.03   0:00.02 rlwrap /Users/hjh/..
@@ -148,7 +162,7 @@ Load qzmq; learn to read online documentation; write multi-threading code in q; 
     "  171        172         0.0 S    31T   0:00.00   0:00.00 "
     ..
 
-<A name="toc2-145" title="A Longer Tour of qzmq" />
+<A name="toc2-159" title="A Longer Tour of qzmq" />
 ## A Longer Tour of qzmq
 
 `qzmq_test.q` contains qzmq translation of czmq's self-tests. It can be used as examples of each API.
@@ -157,10 +171,10 @@ Code in `demos/*` shows cross-language clients and servers that are interchangea
 
 ZeroMQ [Guide][zguide] has examples in many languages. Translation of these examples to q is [under way](https://github.com/imatix/zguide/tree/master/examples/Q)  (pulled from [here](https://github.com/jaeheum/zguide/tree/master/examples/Q)). See [Issue #5](https://github.com/jaeheum/qzmq/issues/5).
 
-<A name="toc2-154" title="Issues" />
+<A name="toc2-168" title="Issues" />
 ## Issues
 See the [issue tracker][issues].
-<A name="toc2-158" title="" />
+<A name="toc2-172" title="" />
 
 ---
 
