@@ -1,59 +1,33 @@
-<A name="toc1-1" title="Installing ZeroMQ and Language Bindings" />
-# Installing ZeroMQ and Language Bindings
+
+Tite: demo/installation
+Date: 20121013
+
+<A name="toc1-5" title="Contents" />
+# Contents
+
+
+**<a href="#toc1-10">Installing ZeroMQ Language Bindings</a>**
+&emsp;<a href="#toc2-15">Instaling Language Bindings</a>
+&emsp;<a href="#toc2-19">Q</a>
+&emsp;<a href="#toc2-23">Python</a>
+&emsp;<a href="#toc2-40">Perl</a>
+&emsp;<a href="#toc2-51">Java</a>
+&emsp;<a href="#toc2-57">Misc</a>
+
+<A name="toc1-10" title="Installing ZeroMQ Language Bindings" />
+# Installing ZeroMQ Language Bindings
 
 ZeroMQ is written in C but there are many bindings for other  [languages][languages]. Before running demos, install ZeroMQ and the necessary language bindings.
 
-Summary:
-
-* Install ZeroMQ version 2.2.
-* Install Python ZeroMQ bindings.
-* Install Perl one for extra credit.
-* Install others as needed (at the price of mental aggrevation).
-
-<A name="toc2-13" title="ZeroMQ" />
-## ZeroMQ
-
-<A name="toc3-16" title="Version of ZeroMQ" />
-### Version of ZeroMQ
-ZeroMQ version 2.2 is recommended for the demos because Python and Perl bindings use it.
-
-<A name="toc3-20" title="Installing ZeroMQ Without Compiling" />
-### Installing ZeroMQ Without Compiling
-<A name="toc4-22" title="Linux" />
-#### Linux
-See [http://www.zeromq.org/distro:_start](http://www.zeromq.org/distro:_start)
-
-For example, RHEL [http://www.zeromq.org/distro:centos](http://www.zeromq.org/distro:centos)
-
-As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run `yum` to install ZeroMQ.
-
-    yum-config-manager --add-repo http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
-    yum install zeromq
-    yum install zeromq-devel
-
-`man zmq` and it should display 0MQ 2.2.0 at the bottom of the man page.
-
-<A name="toc4-36" title="Mac OS X" />
-#### Mac OS X
-There is no installer with prebuilt binaries. There are two ways to install ZeroMQ on Mac OS X:
-
-* Install [homebrew]. Then run `brew install zeromq`. This will install ZeroMQ matching your OS/hardware. Another option is to run `brew install --universal zeromq` for both 32-bit and 64-bit versions.
-* Install ZeroMQ from source code (see the next section).
-
-<A name="toc4-43" title="Windows" />
-#### Windows
-Note that Windows is not used nor tested for the demos but mentioned for the sake of completeness: [http://www.zeromq.org/distro:microsoft-windows](http://www.zeromq.org/distro:microsoft-windows). 
-
-<A name="toc3-47" title="Installing ZeroMQ From Source Code" />
-### Installing ZeroMQ From Source Code
-
-[http://www.zeromq.org/intro:get-the-software](http://www.zeromq.org/intro:get-the-software) -- you need to have modern day development tools like  libtool, autoconf, automake and gcc tool-chain.
-
-<A name="toc2-52" title="Instaling Language Bindings" />
+<A name="toc2-15" title="Instaling Language Bindings" />
 ## Instaling Language Bindings
-ZeroMQ must be installed prior to installing language bindings.
+ZeroMQ must be installed prior to installing language bindings. See [`how-to-install-zeromq-czmq.md`](../how-to-install-zeromq-czmq.md) for installation instructions.
 
-<A name="toc2-56" title="Python" />
+<A name="toc2-19" title="Q" />
+## Q
+See [qzmq][qzmq].
+
+<A name="toc2-23" title="Python" />
 ## Python
 Install [pyzmq][pyzmq]:
 
@@ -70,7 +44,7 @@ One quick check for successful installation:
     '2.2.0'
     # either '2.2.0' or '2.2.0.1' is acceptable.
 
-<A name="toc2-73" title="Perl" />
+<A name="toc2-40" title="Perl" />
 ## Perl
 Install [ZeroMQ.pm][perl] from CPAN:
 
@@ -81,16 +55,19 @@ One quick check for successful installation:
     $ perl -e 'use ZeroMQ qw/:all/; print "ZeroMQ version is: " . ZeroMQ::version() . "\n";'
     ZeroMQ version is: 2.2.0
     
-<A name="toc2-84" title="Java" />
+<A name="toc2-51" title="Java" />
 ## Java
-Currently the demo does not include any Java code. (An exercise for the readers.)
+Currently the demo does not include any Java code.
 
 See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) for installation instructions and documentation of Java bindings.
 
-<A name="toc2-90" title="Q" />
-## Q
-[qzmq][qzmq] installation is [still rough around edges][issue6]. In addition to ZeroMQ, qzmq uses [Czmq][czmq] which is currently only installable from source code.
+<A name="toc2-57" title="Misc" />
+## Misc
 
+    yum install nc
+    cpan -i Digest::SHA1
+    cpan -i Module::Build
+    cpan -i String::Random
 
 [qzmq]: https://github.com/jaeheum/qzmq
 [issues]: https://github.com/jaeheum/qzmq/issues
