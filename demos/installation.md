@@ -1,5 +1,5 @@
 
-Tite: demo/installation
+Title: demo/installation
 Date: 20121013
 
 <A name="toc1-5" title="Contents" />

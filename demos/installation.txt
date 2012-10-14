@@ -1,6 +1,6 @@
 .set GIT=https://github.com/jaeheum/qzmq
 
-Tite: demo/installation
+Title: demo/installation
 Date: &date()
 
 # Contents

@@ -1,27 +1,29 @@
+Title: demo/README
+Date: 20121013
 
-<A name="toc1-2" title="Cross-Language Distributed System With ZeroMQ and qzmq" />
+<A name="toc1-4" title="Cross-Language Distributed System With ZeroMQ and qzmq" />
 # Cross-Language Distributed System With ZeroMQ and qzmq
 
-This article outlines a few simple demonstrations of cross-language distributed systems. Please use the [issue tracker][issues] for all issues and comments. (Last edit date: 20120904)
+This article outlines a few simple demonstrations of cross-language distributed systems. Please use the [issue tracker][issues] for all issues and comments. (Last edit date: 20121013)
 
-<A name="toc2-7" title="Contents" />
+<A name="toc2-9" title="Contents" />
 ## Contents
 
-&emsp;<a href="#toc2-12">Installation</a>
-&emsp;<a href="#toc2-17">Running Clients/Servers In Different Languages</a>
-&emsp;<a href="#toc2-137">Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server</a>
-&emsp;<a href="#toc2-153">Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance</a>
-&emsp;<a href="#toc3-198">Load Balancing and Fault Tolerance</a>
-&emsp;<a href="#toc2-208">Further Information</a>
-&emsp;<a href="#toc2-216">License</a>
-&emsp;<a href="#toc2-226"></a>
+&emsp;<a href="#toc2-14">Installation</a>
+&emsp;<a href="#toc2-19">Running Clients/Servers In Different Languages</a>
+&emsp;<a href="#toc2-139">Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server</a>
+&emsp;<a href="#toc2-155">Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance</a>
+&emsp;<a href="#toc3-200">Load Balancing and Fault Tolerance</a>
+&emsp;<a href="#toc2-210">Further Information</a>
+&emsp;<a href="#toc2-218">License</a>
+&emsp;<a href="#toc2-228"></a>
 
-<A name="toc2-12" title="Installation" />
+<A name="toc2-14" title="Installation" />
 ## Installation
 
 See [installation.md][installation] for installing both ZeroMQ and language bindings.
 
-<A name="toc2-17" title="Running Clients/Servers In Different Languages" />
+<A name="toc2-19" title="Running Clients/Servers In Different Languages" />
 ## Running Clients/Servers In Different Languages
 
 <center>
@@ -128,7 +130,7 @@ Here is a transcript of running `zmq_push`, `req.py` and `rep.py` in three termi
     perl (pid=16369): sending back sha1 of the received data: f67665591fad08d1620c65c4c2f345b0b7083577
     
 
-<A name="toc2-137" title="Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server" />
+<A name="toc2-139" title="Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server" />
 ## Multiple Clients Talking to a Single Server with Different Languages for the Clients and the Server
 
 Launch a single server from a terminal:
@@ -144,7 +146,7 @@ Launch many clients `c.py` in many terminals. `c.py` sends a date/time string ev
     python (pid=7962): received sha1 of data: 97bf5dfb1c76991dbb15054728826422c175e13e
     # ... in other terminals the different pid values of c.py will appear
 
-<A name="toc2-153" title="Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance" />
+<A name="toc2-155" title="Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance" />
 ## Multiple Clients/Multiple Servers with Load Balancing and Fault Tolerance
 
 Multiple clients and a single server configuration has at least two problems: the server has a scalability limit and is a single point of failure (SPOF). Running multiple servers to share load is a solution to SPOF and scalability. However this solution needs more elaboration. If the clients need to maintain addresses of the servers, then the clients themselves need to handle load balancing (choosing one server out of many) and fault tolerance (as servers appear/disappear). It is obvious that clients need to coordinate among themselves to devise globally optimal dynamic configuration because otherwise poor utilization will be added to the problem of SPOF and scalability.
@@ -189,7 +191,7 @@ Output from a client pid=10909 shows the client received back what it had sent o
     12-08-10 01:36:37 q (pid=10909) received the original data: pwiertptor (from client pid=10909)
     ... 
 
-<A name="toc3-198" title="Load Balancing and Fault Tolerance" />
+<A name="toc3-200" title="Load Balancing and Fault Tolerance" />
 ### Load Balancing and Fault Tolerance
 
 Try the following:
@@ -199,7 +201,7 @@ Try the following:
 * Start a server, it handles all requests from the clients that come out of their pause.
 * Start more servers and they share the load together. (load balancing)
 
-<A name="toc2-208" title="Further Information" />
+<A name="toc2-210" title="Further Information" />
 ## Further Information
 
 Cross-language distributed system is a large subject and we have already touched on a sensitive topic of "broker" that enables a multiple client to multiple server configuration at a cost of having a [man-in-the-middle][mitm]. For more discussions from ZeroMQ perspectives, start with:
@@ -207,7 +209,7 @@ Cross-language distributed system is a large subject and we have already touched
 * [ZeroMQ Guide][zguide]
 * [Broker vs Brokerless][brokerless]
 
-<A name="toc2-216" title="License" />
+<A name="toc2-218" title="License" />
 ## License
 
 Copyright (c) 2012 Jaeheum Han
@@ -216,7 +218,7 @@ Copyright (c) 2012 Jaeheum Han
 * Non-AGPL TBD
 
 Note that `msgqueue.py` and `msgqueue.pl` are copyright (c) 2010-2011 iMatix Corporation and Contributors. Their license is [ZeroMQ Guide examples license][zguide-license].
-<A name="toc2-226" title="" />
+<A name="toc2-228" title="" />
 
 ---
 

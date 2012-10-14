@@ -1,5 +1,8 @@
 .set GIT=https://github.com/jaeheum/qzmq
 
+Title: README
+Date: &date()
+
 # qzmq
 
 qzmq provides [Q][q] bindings for [CZMQ][czmq], the high-level C binding for [ØMQ][zeromq].

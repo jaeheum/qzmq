@@ -1,4 +1,6 @@
 .set GIT=https://github.com/jaeheum/qzmq
+Title: demo/README
+Date: &date()
 
 # Cross-Language Distributed System With ZeroMQ and qzmq
 
