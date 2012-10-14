@@ -38,21 +38,20 @@
 #define yn y->n
 #define yt y->t
 #define ys y->s
-#define zh z->h
 #define zi z->i
 #define zj z->j
-#define VSK(x) (V*)(intptr_t)(x->j)
+#define VSK(x) (V*)(intptr_t)(x->j) // void* from K; dual: ptr(V*).
+Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. void*, zctx_t, etc; dual: VSK(x).
 #define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
-#define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // xn can be unset.
-#define TC(x,T) P(x->t!=T,krr("type"))
-#define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
-#define PC(x) TC(x,-KJ)
-
-ZI N(K x){if(xt>0)R xn;R 1;}
+#define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // x->n may be unset for n=1.
 Z K qstr(S s){R s!=NULL?kp(s):(K)0;}
-Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}}
+#define TC(x,T) P(x->t!=T,krr("type")) // typechecker
+#define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
+#define PC(x) TC(x,-KJ) // pointer check; implementation dependent -- see ptr(V*).
+
+ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
 
 Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
 Z K0(zclocktime){R(kj(zclock_time()));}
