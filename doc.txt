@@ -1,0 +1,97 @@
+name                | args          doc                                                                      
+--------------------| ---------------------------------------------------------------------------------------
+qzmq                |               see https://github.com/jaeheum/qzmq/blob/master/README.md.               
+czmq                |               see http://czmq.zeromq.org or 'man czmq'.                                
+zmq                 |               see zmq, czmq z* api man pages, `zsockopt and `zsocket.type_sym.         
+zsockopt            |               see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt' and `zmq.   
+zhash               |               nyi.                                                                     
+zlist               |               nyi.                                                                     
+zclock              |               see http://czmq.zeromq.org/manual:zclock or 'man zclock'.                
+zclock.sleep        | [x]           sleeps for x milliseconds (-6h).                                         
+zclock.time         | []            returns the current timestamp in milliseconds (-7h).                     
+zclock.log          | [x]           prints YY-mm-dd, followed by x (10h).                                    
+zctx                |               see http://czmq.zeromq.org/manual:zctx or 'man zctx'.                    
+zctx.new            | []            creates a new zctx.                                                      
+zctx.destroy        | [x]           destroys the zctx x.                                                     
+zctx.set_iothreads  | [x;y]         sets number of threads for the zctx x to be y (-6h).                     
+zctx.set_linger     | [x;y]         sets y milliseconds (-6h) to flush zsockets in the zctx x.               
+zctx.set_hwm        | [x;y]         sets HWM value y (-6h) for the zctx x.                                   
+zctx.get_hwm        | [x]           returns HWM value (-6h) for the zctx x.                                  
+zctx.interrupted    | []            returns 1b if interrupted by SIGINT/SIGTERM, 0b otherwise.               
+zctx.underlying     | []            nyi.                                                                     
+zfile               |               see http://czmq.zeromq.org/manual:zfile or 'man zfile'.                  
+zfile.delete        | [x]           deletes the `:file x; returns 0i OK, -1i not.                            
+zfile.mkdir         | [x]           makes a `:directory x; returns 0i OK, -1i not.                           
+zfile.exists        | [x]           returns 1i if the `:file x exists, 0i not.                               
+zfile.size          | [x]           returns the size (-7h) of the `:file x.                                  
+zframe              |               see http://czmq.zeromq.org/manual:zframe or 'man zframe'.                
+zframe.new          | [x]           creates a new zframe from x (10h|4h); returns nothing on failure.        
+zframe.new_zero_copy| []            nyi.                                                                     
+zframe.destroy      | [x]           destroys the zframe x.                                                   
+zframe.recv         | [x]           receives, returns the zframe from the zsocket x.                         
+zframe.recvnowait   | [x]           receives, returns the zframe from the zsocket x without waiting.         
+zframe.send         | [x;y;z]       sends the zframe x to the zsocket y with flag z (-6h); fails non-zero.   
+zframe.size         | [x]           returns the byte count of the zframe x.                                  
+zframe.data         | []            nyi.                                                                     
+zframe.dup          | [x]           returns a duplicate of the zframe x.                                     
+zframe.strhex       | []            nyi.                                                                     
+zframe.strdup       | [x]           returns a 10h of the zframe x's data.                                    
+zframe.streq        | [x;y]         returns whether the body of zframe x=y (10h).                            
+zframe.zero_copy    | []            nyi.                                                                     
+zframe.more         | [x]           returns the zframe x's more property (-6h).                              
+zframe.eq           | [x;y]         returns 1b if zframes x=y, 0b otherwise.                                 
+zframe.print        | [x;y]         prints the content of the zframe x prefixed by y (10h) to stderr.        
+zframe.reset        | [x;y]         resets the zframe x with the new data y.                                 
+zloop               |               see http://czmq.zeromq.org/manual:zloop or 'man zloop'.                  
+zloop.new           | []            creates a new zloop.                                                     
+zloop.destroy       | [x]           destroys the zloop x.                                                    
+zloop.poller        | [x;y;z;z4]    `z[z4] runs when the pollitem y is ready in the zloop x; 0i OK, -1i not. 
+zloop.poller_end    | [x;y]         cancels the pollitem y from the zloop x.                                 
+zloop.timer         | [x;y;z;z4;z5] `z4[z5] runs with the delay y, z-times in the zloop x; 0i OK, -1i not.   
+zloop.timer_end     | [x;y]         cancels all timers for the zloop x and y.                                
+zloop.set_verbose   | [x;y]         verbose tracing of the zloop x to y, 1b or 0b.                           
+zloop.start         | [x]           starts zloop x; returns 0i if interrupted, -1i if cancelled by a handler.
+zmsg                |               see http://czmq.zeromq.org/manual:zmsg or 'man zmsg'.                    
+zmsg.new            | []            creates a new empty zmsg.                                                
+zmsg.destroy        | [x]           destroys the zmsg x.                                                     
+zmsg.recv           | [x]           receives the zmsg from zsocket x.                                        
+zmsg.send           | [x;y]         sends the zmsg x to the zsocket y.                                       
+zmsg.size           | [x]           returns number of zframes in the zmsg x.                                 
+zmsg.content_size   | [x]           returns the combined size of all zframes in the zmsg x.                  
+zmsg.push           | [x;y]         pushes the zframe y to the front of the zmsg x.                          
+zmsg.pop            | [x]           pops the zframe y from the front of the zmsg x or raises 'empty.         
+zmsg.add            | [x;y]         adds the zframe y to the end of the zmsg x.                              
+zmsg.pushmem        | []            nyi.                                                                     
+zmsg.addmem         | []            nyi.                                                                     
+zmsg.pushstr        | []            nyi.                                                                     
+zmsg.addstr         | []            nyi.                                                                     
+zmsg.popstr         | []            nyi.                                                                     
+zmsg.wrap           | []            nyi.                                                                     
+zmsg.unwrap         | []            nyi.                                                                     
+zmsg.remove         | []            nyi.                                                                     
+zmsg.first          | [x]           returns the first zframe from the zmsg x or raises 'empty.               
+zmsg.next           | [x]           returns the next zframe from the zmsg x or raises 'empty.                
+zmsg.last           | [x]           returns the last zframe from the zmsg x or raises 'empty.                
+zmsg.save           | [x;y]         saves the zmsg x to the `:file y.                                        
+zmsg.load           | [x;y]         loads the zmsg x from the `:file y.                                      
+zmsg.encode         | []            nyi.                                                                     
+zmsg.decode         | []            nyi.                                                                     
+zmsg.dup            | [x]           returns a duplicate of the zmsg x.                                       
+zmsg.dump           | [x]           dumps the content of the zmsg x to stderr.                               
+zsocket             |               see http://czmq.zeromq.org/manual:zsocket or 'man zsocket'.              
+zsocket.new         | [x;y]         creates the new zsocket of the zmq socket option y (-6h) for the zctx x. 
+zsocket.destroy     | [x;y]         destroys the zsocket y for the zctx x.                                   
+zsocket.bind        | [x;y]         binds the zsocket x to `transport://endpoint y; returns the port (-6h).  
+zsocket.connect     | [x;y]         connects the zsocket x and `transport://endpoint y; 0i OK, -1i not.      
+zsocket.type_sym    | [x]           prints the `option of the zsocket x. (N.B. czmq type_str())              
+zstr                |               see http://czmq.zeromq.org/manual:zstr or 'man zstr'.                    
+zstr.recv           | [x]           returns a 10h received from the zsocket x.                               
+zstr.recv_nowait    | [x]           returns a 10h received from the zsocket x without waiting.               
+zstr.send           | [x;y]         sends y (10h) to the zsocket x; 0i OK, -1i not.                          
+zstr.sendm          | [x;y]         sends y (10h) to the zsocket x with MORE flag; 0i OK, -1i not.           
+zthread             |               see http://czmq.zeromq.org/manual:zthread or 'man zthread'.              
+zthread.new         | [x;y]         creates a detached thread running `x[y].                                 
+zthread.fork        | [x;y;z]       creates an attached thread running `y[z] in the zctx x.                  
+libzmq              |               see http://api.zeromq.org or 'man zmq'.                                  
+libzmq.version      | []            returns major, minor, patch version numbers (6h) of libzmq.              
+libzmq.device       | [x;y;z]       sets a zmq_device for the zctx x, the zsockets y, z. see 'man zmq_device'
