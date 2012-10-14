@@ -121,16 +121,10 @@ Z K4(zlooppoller){PC(x); TC(y,0); TC(z,-KS);
 Z K2(zlooppollerend){PC(x); PC(y); zloop_poller_end(VSK(x), VSK(y)); R(K)0;}
 // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 Z K5(zlooptimer){PC(x); TC2(y,-KI,-KJ); TC2(z,-KI,-KJ); TC(z4,-KS); 
-    ZTK(zloop_t,loop);
-    settimerfn(z4);
-    I rc=zloop_timer(loop, yj, zj, timer_loop_fn, z5);
-    R ki(rc);}
+    ZTK(zloop_t,loop); settimerfn(z4); R ki(zloop_timer(loop, yj, zj, timer_loop_fn, z5));}
 Z K2(zlooptimerend){PC(x); PC(y); zloop_timer_end(VSK(x), VSK(y)); R(K)0;}
 Z K2(zloopsetverbose){PC(x); TC(y,-KB); ZTK(zloop_t,loop); zloop_set_verbose(loop, y->g); R(K)0;}
-Z K1(zloopstart){PC(x);
-    ZTK(zloop_t,loop);  
-    I rc=zloop_start(loop);
-    R ki(rc);}
+Z K1(zloopstart){PC(x); ZTK(zloop_t,loop); R ki(zloop_start(loop));}
 
 Z K0(zmsgnew){zmsg_t*m=zmsg_new(); P(m, ptr(m)); R(K)0;}
 Z K1(zmsgdestroy){PC(x); ZTK(zmsg_t,m); zmsg_destroy(&m); R(K)0;}
@@ -540,7 +534,7 @@ K0(makedoc){
     js(&kd, ss("zsockopt")); js(&argz, ss("")); js(&docstrings, ss("see http://czmq.zeromq.org/manual:zsockopt or 'man zsockopt' and `zmq."));
     js(&kd, ss("zhash")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
     js(&kd, ss("zlist")); js(&argz, ss("")); js(&docstrings, ss("nyi."));
-    for(i=0; i < (int)tblsize(apis); i++) {
+    for(i=0; i < (I)tblsize(apis); i++) {
         js(&kd, ss(each[i][0].apiname)); js(&argz, ss(""));
         if(strcmp(each[i][0].apiname, "libzmq")==0){snprintf(see, sizeof(see), "see http://api.zeromq.org or 'man zmq'.");}
         else{snprintf(see, sizeof(see), "see http://czmq.zeromq.org/manual:%s or 'man %s'.", each[i][0].apiname, each[i][0].apiname);}
@@ -609,7 +603,7 @@ Z struct {S k; I v;} zmqopt[] = {
 };
 #define OPTTAB(k,v) xS[i]=ss(k);kK(y)[i]=ki(v)
 
-K1(zmq){int n=tblsize(zmqopt);
+K1(zmq){I n=tblsize(zmqopt);
     K y=ktn(0,n);x=ktn(KS,n);
     DO(tblsize(zmqopt), OPTTAB(zmqopt[i].k, zmqopt[i].v));
     R xD(x,y);}
