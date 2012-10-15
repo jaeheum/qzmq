@@ -16,8 +16,8 @@ Title: how-to-install-zeromq-czmq
 ### Linux
 See [http://www.zeromq.org/distro:_start](http://www.zeromq.org/distro:_start)
 
-<A name="toc4-19" title="RHEL, CentOS, SUSE (RPM based distributions)" />
-#### RHEL, CentOS, SUSE (RPM based distributions)
+<A name="toc4-19" title="RHEL, CentOS (RPM based distributions)" />
+#### RHEL, CentOS (RPM based distributions)
 See [http://www.zeromq.org/distro:centos](http://www.zeromq.org/distro:centos)
 
 As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run `yum` to install ZeroMQ and CZMQ.
@@ -36,9 +36,19 @@ As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run
 
 <A name="toc4-37" title="Debian, Ubuntu (deb based distributions)" />
 #### Debian, Ubuntu (deb based distributions)
-(TBD)
+    # first two commands install `add-apt-repository` (skip if installed).
+    sudo apt-get update
+    sudo apt-get install python-software-properties
+    # see https://launchpad.net/~chris-lea/+archive/zeromq
+    sudo add-apt-repository ppa:chris-lea/zeromq
+    sudo apt-get update
+    sudo apt-get install  libzmq-dev
+    # see https://launchpad.net/~ori-livneh/+archive/e3
+    sudo add-apt-repository  ppa:ori-livneh/e3
+    sudo apt-get install  libczmq-dev
 
-<A name="toc3-41" title="Mac OS X" />
+
+<A name="toc3-51" title="Mac OS X" />
 ### Mac OS X
 There is no installer with prebuilt binaries. There are two ways to install ZeroMQ on Mac OS X:
 
@@ -47,11 +57,11 @@ There is no installer with prebuilt binaries. There are two ways to install Zero
     * `brew install --universal czmq` # ditto
 * Install ZeroMQ from source code (see the next section).
 
-<A name="toc3-50" title="Windows" />
+<A name="toc3-60" title="Windows" />
 ### Windows
 See [http://www.zeromq.org/distro:microsoft-windows](http://www.zeromq.org/distro:microsoft-windows). 
 
-<A name="toc2-54" title="Installing ZeroMQ From Source Code" />
+<A name="toc2-64" title="Installing ZeroMQ From Source Code" />
 ## Installing ZeroMQ From Source Code
 
 See [http://www.zeromq.org/intro:get-the-software](http://www.zeromq.org/intro:get-the-software) -- you need to have modern day development tools like  libtool, autoconf, automake and gcc tool-chain.
