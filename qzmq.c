@@ -41,16 +41,15 @@
 #define zi z->i
 #define zj z->j
 #define VSK(x) (V*)(intptr_t)(x->j) // void* from K; dual: ptr(V*).
-Z K ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. void*, zctx_t, etc; dual: VSK(x).
+ZK ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. void*, zctx_t, etc; dual: VSK(x).
 #define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
 #define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // x->n may be unset for n=1.
-Z K qstr(S s){R s!=NULL?kp(s):(K)0;}
+ZK qstr(S s){R s!=NULL?kp(s):(K)0;}
 #define TC(x,T) P(x->t!=T,krr("type")) // typechecker
 #define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
 #define PC(x) TC(x,-KJ) // pointer check; implementation dependent -- see ptr(V*).
-
 ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
 
 Z K1(zclocksleep){TC(x,-KI); zclock_sleep(xi); R(K)0;}
@@ -92,24 +91,22 @@ Z K2(zframeeq){PC(x); PC(y); R kb(zframe_eq(VSK(x), VSK(y)));}
 Z K2(zframeprint){TC(y,KC); CSTR(y); zframe_print(VSK(x), s); R(K)0;}
 Z K2(zframereset){zframe_reset(VSK(x), yG, N(y)); R(K)0;}
 
-static K eventfn;
-static K timerfn;
-ZV seteventfn(K x){r1(x);eventfn=x;}
-ZV settimerfn(K x){r1(x);timerfn=x;}
 Z K0(zloopnew){zloop_t*l=zloop_new(); P(l, ptr(l)); R(K)0;}
 Z K1(zloopdestroy){PC(x); ZTK(zloop_t,l); zloop_destroy(&l); R(K)0;}
+// three-tier implementation of zloop:
+// - user-visible API zloop_poller and zloop_timer take a q worker function named  by a -11h.
+// - q worker function is set in a placeholder (call from q itself is singlethreaded).
+// - implementation functions event_loop_fn() and timer_loop_fn() satisfy function pointer typedef defined by zloop C API
+// - implementation functions do q callbacks with k().
+// q) eventfn:{...}
+// q) zloop.poller[loop; (...); `eventfn; args] / starts an event loop
+// q) ...
+ZK eventfn;
+ZV seteventfn(K x){r1(x);eventfn=x;}
 //typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
 ZI event_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
     K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=ptr(item); kK(w)[2]=ptr(args);
     K x=k(0, ".", eventfn, w, (K)0);
-    if(xt==-128){O("k() error: %s\n", xs);}
-    R xi;}
-ZV*silence(zmq_pollitem_t*item){R item;}
-//typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
-ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
-    silence(item); // for the compiler
-    K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=kj(0); /* item is null for timer */; kK(w)[2]=ptr(args);
-    K x=k(0, ".", timerfn, w, (K)0);
     if(xt==-128){O("k() error: %s\n", xs);}
     R xi;}
 //    zloop_poller (zloop_t *self, zmq_pollitem_t *item, zloop_fn handler, void *arg);
@@ -119,6 +116,19 @@ Z K4(zlooppoller){PC(x); TC(y,0); TC(z,-KS);
     zmq_pollitem_t item={VSK(yK[0]), yK[1]->i, yK[2]->h,yK[3]->h};
     R ki(zloop_poller(loop, &item, event_loop_fn, z4));}
 Z K2(zlooppollerend){PC(x); PC(y); zloop_poller_end(VSK(x), VSK(y)); R(K)0;}
+// q) timerfn:{...}
+// q) zloop.timer[loop; x; y; `timerfn; args] / starts a timer loop
+// q) ...
+ZV*silence(zmq_pollitem_t*item){R item;} // for the compiler
+ZK timerfn;
+ZV settimerfn(K x){r1(x);timerfn=x;}
+//typedef int (zloop_fn) (zloop_t *loop, zmq_pollitem_t *item, void *arg);
+ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
+    silence(item); // for the compiler
+    K w=ktn(KJ,3); kK(w)[0]=ptr(loop); kK(w)[1]=kj(0); /* item is null for timer */; kK(w)[2]=ptr(args);
+    K x=k(0, ".", timerfn, w, (K)0);
+    if(xt==-128){O("k() error: %s\n", xs);}
+    R xi;}
 // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
 Z K5(zlooptimer){PC(x); TC2(y,-KI,-KJ); TC2(z,-KI,-KJ); TC(z4,-KS); 
     ZTK(zloop_t,loop); settimerfn(z4); R ki(zloop_timer(loop, yj, zj, timer_loop_fn, z5));}
@@ -265,12 +275,17 @@ Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)fre
 Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_send(VSK(x), s));}
 Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_sendm(VSK(x), s));}
 
-static K attachedfn;
-static K detachedfn;
-ZV setattachedfn(K x){r1(x);attachedfn=x;}
+// three-tier implementation of zthread:
+// - user-visible API zthread_new and zthread_fork take a q worker function named  by a -11h.
+// - q worker function is set in a placeholder (call from q itself is singlethreaded).
+// - implementation functions df() and af() satisfy function pointer typedef defined by zthread C API
+// - implementation functions do q callbacks with k().
+// q) qdf:{...}
+// q) zthread.new[`qdf; args] / creates a new thread running qdf[zrgs]
+// q) ...
+ZK detachedfn;
 ZV setdetachedfn(K x){r1(x);detachedfn=x;}
-
-//typedef void *(zthread_detached_fn) (void *args);
+// typedef void *(zthread_detached_fn) (void *args);
 ZV*df(V*args){
     K x=k(0, "@", detachedfn, args, (K)0);
     if(xt==-128){O("k() error: %s\n", xs);}
@@ -283,13 +298,17 @@ Z K2(zthreadnew){TC(x,-KS);
     r0(x);
     R ki(rc);}
 
+// q) qaf:{...}
+// q) zthread.fork[ctx; `qaf; args] / forks a thread running qaf[args]
+// q) ...
+ZK attachedfn;
+ZV setattachedfn(K x){r1(x);attachedfn=x;}
 // typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
 ZV af(V*args, zctx_t*ctx, V*pipe){
     K x=k(0, ".", attachedfn, knk(3, args, ptr(ctx), ptr(pipe)), 0);
     if(xt==-128){O("k() error: %s\n", xs);}
     r0(x); m9();}
 // void* zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
-// From q: zthreadfork[ctx; `qaf; args;]
 Z K3(zthreadfork){PC(x); TC(y,-KS); 
     r1(y);
     setattachedfn(y);
