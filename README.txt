@@ -72,7 +72,7 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
         -I./kx/q2.8  -I/usr/include/ \
         -L./kx/q2.8/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
-    
+
     # for Debian, Ubuntu, ... (kdb+ v2.8 "l32")
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
@@ -93,7 +93,7 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
         -I./kx/q3.0  -I/usr/include/ \
         -L./kx/q3.0/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
-    
+
     # for Debian, Ubuntu, ... (kdb+ v3.0 "l32")
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
