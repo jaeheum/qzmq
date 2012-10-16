@@ -46,12 +46,12 @@ A few background setup commands for a new Debian/Ubuntu installation:
 ### Mac OS X
 There is no installer with prebuilt binaries. There are two ways to install ZeroMQ on Mac OS X:
 
-* Install [homebrew]. Then run
+Install [homebrew], then run
 
     brew install --universal zeromq # for both 32-bit and 64-bit versions.
     brew install --universal czmq # ditto
 
-* Install ZeroMQ from source code (see the next section).
+or install ZeroMQ from source code (see the next section).
 
 ### Windows
 See [http://www.zeromq.org/distro:microsoft-windows](http://www.zeromq.org/distro:microsoft-windows). 
