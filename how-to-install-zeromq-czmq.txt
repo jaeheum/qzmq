@@ -1,6 +1,7 @@
 .set GIT=https://github.com/jaeheum/qzmq
 
 Title: how-to-install-zeromq-czmq
+Date: &date()
 
 # Install ZeroMQ and CZMQ
 
@@ -35,6 +36,7 @@ As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run
 Installing ZeroMQ and CZMQ from source code is recommended.
 
 A few background setup commands for a new Debian/Ubuntu installation:
+
     sudo apt-get install gcc
     sudo apt-get install g++
     sudo apt-get install uuid-dev
@@ -45,8 +47,10 @@ A few background setup commands for a new Debian/Ubuntu installation:
 There is no installer with prebuilt binaries. There are two ways to install ZeroMQ on Mac OS X:
 
 * Install [homebrew]. Then run
-    * `brew install --universal zeromq` # for both 32-bit and 64-bit versions.
-    * `brew install --universal czmq` # ditto
+
+    brew install --universal zeromq # for both 32-bit and 64-bit versions.
+    brew install --universal czmq # ditto
+
 * Install ZeroMQ from source code (see the next section).
 
 ### Windows
