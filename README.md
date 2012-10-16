@@ -78,14 +78,14 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
         -L./kx/q2.8/m32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v2.8 "l32")
+    # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v2.8 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
         -I./kx/q2.8  -I/usr/include/ \
         -L./kx/q2.8/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for Debian, Ubuntu, ... (kdb+ v2.8 "l32")
+    # for Debian, Ubuntu, ... (kdb+ v2.8 "l32") wtih ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
         -I./kx/q2.8  -I/usr/local/include/ \
@@ -169,7 +169,7 @@ Load qzmq; learn to read online documentation; write multi-threading code in q; 
     zthread.new | [x;y]   creates a detached thread running `x[y].               ..
     zthread.fork| [x;y;z] creates an attached thread running `y[z] in the zctx x...
     q) / launch some detached threads
-    q)dthr:{zclock.log x; zclock.sleep 1000*1000; :0N}
+    q)dthr:{zclock.log x; zclock.sleep 1000i*1000i; :0N}
     q)i:0; do[10; zthread.new[`dthr; "tid",string i]; i+:1]
     12-10-05 23:31:22 tid1
     12-10-05 23:31:22 tid0
