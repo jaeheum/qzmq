@@ -40,7 +40,7 @@ frame:zframe.new["NOT"]
 zframe.reset[frame; "END"]
 /if[max "454E44"<>zframe.strhex[frame]; '`fail]
 if[max 0x454e44<>zframe.strdup[frame]; '`fail]
-rc:zframe.send[frame; output; 0i]; if[rc<>0; '`fail]
+if[0<>rc:zframe.send[frame; output; 0i]; '`fail]
 end:0b; while[not end; frame:zframe.recv[input]; zframe.print[frame; "recv:"]; if[end:zframe.streq[frame; "END"]; zframe.destroy[frame]]]
 zctx.destroy[ctx]
 "pass"
@@ -94,7 +94,7 @@ zmsg.dump[msg]
 if[0<>zmsg.save[msg; `:zmsg.test]; '`fail]
 if[10<>zmsg.size[msg:zmsg.load[zmsg.new[]; `:zmsg.test]]; '`fail]
 if[60<>zmsg.content_size[msg]; '`fail]
-rc:zfile.delete[`:zmsg.test]; if[rc<>0; '`fail]
+if[0<>rc:zfile.delete[`:zmsg.test]; '`fail]
 zmsg.destroy[msg]
 msg:zmsg.new[]
 if[0<>zmsg.size[msg]; '`fail]
@@ -119,8 +119,8 @@ domain:"localhost"
 port:zsocket.bind[writer; `$"tcp://",interf,":",string service]
 if[port<>service; '`fail]
 port:zsocket.connect[reader; `$"tcp://",domain,":",string service]
-rc:zstr.send[writer; "HELLO"]; if[rc<>0i; '`fail]
-rc:zstr.send[writer; "1"]; if[rc<>0i; '`fail]
+if[0i<>rc:zstr.send[writer; "HELLO"]; '`fail]
+if[0i<>rc:zstr.send[writer; "1"]; '`fail]
 msg:zstr.recv[reader]
 0N!msg
 port:zsocket.bind[writer; `$"tcp://",interf,":*"]
@@ -188,8 +188,7 @@ zctx.destroy[ctx]
 / detached thread
 ctx:zctx.new[]
 dthr:{ctx:zctx.new[]; push:zsocket.new[ctx; zmq.PUSH]; zclock.sleep[1000i]; zctx.destroy[ctx]; :0N}
-rc:zthread.new[`dthr; 0N]
-if[rc<>0; '`fail]
+if[0i<>rc:zthread.new[`dthr; 0N]; '`fail]
 zclock.sleep 100i
 /attached thread
 pong:{[args;ctx;pipe] zsocket.new[ctx; zmq.PUSH]; zstr.recv[pipe]; zstr.send[pipe; "pong"]}
