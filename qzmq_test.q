@@ -38,7 +38,7 @@ if[zframe.size[copy]<>count 1000#0x00; '`fail] / "hello2"
 zframe.destroy[copy]
 frame:zframe.new["NOT"]
 zframe.reset[frame; "END"]
-if[max 0x454e44<>zframe.strdup[frame]; '`fail]
+if[not 0x454e44~zframe.strdup[frame]; '`fail]
 if[0<>rc:zframe.send[frame; output; 0i]; '`fail]
 end:0b; while[not end; frame:zframe.recv[input]; zframe.print[frame; "recv:"]; if[end:zframe.streq[frame; "END"]; zframe.destroy[frame]]]
 zctx.destroy[ctx]
