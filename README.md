@@ -1,6 +1,6 @@
 
 Title: README
-Date: 20121016
+Date: 20121017
 
 <A name="toc1-5" title="qzmq" />
 # qzmq
@@ -74,43 +74,43 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
     # for Mac OS X (kdb+ v2.8 "m32")
     gcc -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
         -Wall -Wextra \
-        -I./kx/q2.8  -I/usr/local/include/ \
-        -L./kx/q2.8/m32 -L/usr/local/lib -lzmq -lczmq
+        -I./kx/kdb+2.8  -I/usr/local/include/ \
+        -L./kx/kdb+2.8/m32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
     # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v2.8 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
-        -I./kx/q2.8  -I/usr/include/ \
-        -L./kx/q2.8/l32 -L/usr/lib -lzmq -lczmq
+        -I./kx/kdb+2.8  -I/usr/include/ \
+        -L./kx/kdb+2.8/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
     # for Debian, Ubuntu, ... (kdb+ v2.8 "l32") wtih ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
-        -I./kx/q2.8  -I/usr/local/include/ \
-        -L./kx/q2.8/l32 -L/usr/local/lib -lzmq -lczmq
+        -I./kx/kdb+2.8  -I/usr/local/include/ \
+        -L./kx/kdb+2.8/l32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
     # for Mac OS X (kdb+ v3.0 "m32")
     gcc -DKXVER=3  -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
         -Wall -Wextra \
-        -I./kx/q3.0  -I/usr/local/include/ \
-        -L./kx/q3.0/m32 -L/usr/local/lib -lzmq -lczmq
+        -I./kx/kdb+3.0  -I/usr/local/include/ \
+        -L./kx/kdb+3.0/m32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
     # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v3.0 "l32")
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
-        -I./kx/q3.0  -I/usr/include/ \
-        -L./kx/q3.0/l32 -L/usr/lib -lzmq -lczmq
+        -I./kx/kdb+3.0  -I/usr/include/ \
+        -L./kx/kdb+3.0/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
     # for Debian, Ubuntu, ... (kdb+ v3.0 "l32")
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
-        -I./kx/q3.0/l32  -I/usr/local/include/ \
-        -L./kx/q3.0/l32 -L/usr/local/lib -lzmq -lczmq
+        -I./kx/kdb+3.0/l32  -I/usr/local/include/ \
+        -L./kx/kdb+3.0/l32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
     
 <A name="toc2-109" title="A Quick Tour of qzmq" />
