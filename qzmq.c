@@ -49,7 +49,7 @@ ZK ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. v
 ZK qstr(S s){R s!=NULL?kp(s):(K)0;}
 #define TC(x,T) P(x->t!=T,krr("type")) // typechecker
 #define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
-#define IC(x) P(x->t==-KJ&&x->j>wi,krr("type"));if(x->t==-KJ)x=ki((int)x->j); // j from i (<0Wi).
+#define IC(x) P(x->t==-KJ&&x->j>wi,krr("type"));if(x->t==-KJ)x=ki((int)x->j); // j from i (=<0Wi).
 #define PC(x) TC(x,-KJ) // pointer check; implementation dependent -- see ptr(V*).
 ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
 
