@@ -2,7 +2,7 @@
 \l qzmq.q
 //  --------------------------------------------------------------------------
 "running zclock test"
-start:zclock.time[]; zclock.sleep[10i]; if[(zclock.time[] - start)<10i; '`fail]
+start:zclock.time[]; zclock.sleep[10j]; if[(zclock.time[] - start)<10i; '`fail]
 zclock.log["log format is: YY-MM-DD hh:mm:ss followed by user entered text"]
 "pass"
 //  --------------------------------------------------------------------------
@@ -183,9 +183,9 @@ zctx.destroy[ctx]
 "running zthread test"
 / detached thread
 ctx:zctx.new[]
-dthr:{ctx:zctx.new[]; push:zsocket.new[ctx; zmq.PUSH]; zclock.sleep[1000i]; zctx.destroy[ctx]; :0N}
+dthr:{ctx:zctx.new[]; push:zsocket.new[ctx; zmq.PUSH]; zclock.sleep[1000]; zctx.destroy[ctx]; :0N}
 if[0i<>rc:zthread.new[`dthr; 0N]; '`fail]
-zclock.sleep 100i
+zclock.sleep 100
 /attached thread
 pong:{[args;ctx;pipe] zsocket.new[ctx; zmq.PUSH]; zstr.recv[pipe]; zstr.send[pipe; "pong"]}
 pipe:zthread.fork[ctx; `pong; 0N]
