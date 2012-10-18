@@ -94,4 +94,4 @@ zthread.new         | [x;y]         creates a detached thread running `x[y].
 zthread.fork        | [x;y;z]       creates an attached thread running `y[z] in the zctx x.                  
 libzmq              |               see http://api.zeromq.org or 'man zmq'.                                  
 libzmq.version      | []            returns major, minor, patch version numbers (6h) of libzmq.              
-libzmq.device       | [x;y;z]       sets a zmq_device for the zctx x, the zsockets y, z. see 'man zmq_device'
+libzmq.device       | [x;y;z]       sets a zmq_device x (-6h), the zsockets y, z. see 'man zmq_device'       

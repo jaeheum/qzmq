@@ -4,4 +4,4 @@
 .qzmq.doc
 \\
 to generate doc.txt
-cat doc.q|q
+rm doc.txt; cat doc.q|q
