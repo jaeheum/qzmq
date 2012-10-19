@@ -1,31 +1,35 @@
 
 Title: README
-Date: 20121017
+Date: 20121019
 
 <A name="toc1-5" title="qzmq" />
 # qzmq
 
 qzmq provides [Q][q] bindings for [CZMQ][czmq], the high-level C binding for [ØMQ][zeromq].
 
-This is version 1.2.0-RC1 of qzmq.
+This is version 1.2.0-RC2 of qzmq.
+
+- 1.2.0-RC2: installation instructions for RHEL6/CentOS6, Ubuntu, Mac OS X
+- 1.2.0-RC1: documentation added
+- 1.2.0-RC0: CZMQ 1.2.0 support
 
 qzmq is written and maintained by Jaeheum Han.
 
 qzmq is hosted at [github][qzmq] and it uses the [issue tracker][issues] for all issues and comments.
 
-<A name="toc2-16" title="Contents" />
+<A name="toc2-20" title="Contents" />
 ## Contents
 
-&emsp;<a href="#toc2-21">Features of qzmq</a>
-&emsp;<a href="#toc2-31">License</a>
-&emsp;<a href="#toc2-45">Files of qzmq</a>
-&emsp;<a href="#toc2-61">Building qzmq</a>
-&emsp;<a href="#toc2-109">A Quick Tour of qzmq</a>
-&emsp;<a href="#toc2-216">A Longer Tour of qzmq</a>
-&emsp;<a href="#toc2-225">Issues</a>
-&emsp;<a href="#toc2-229"></a>
+&emsp;<a href="#toc2-25">Features of qzmq</a>
+&emsp;<a href="#toc2-35">License</a>
+&emsp;<a href="#toc2-49">Files of qzmq</a>
+&emsp;<a href="#toc2-65">Building qzmq</a>
+&emsp;<a href="#toc2-113">A Quick Tour of qzmq</a>
+&emsp;<a href="#toc2-220">A Longer Tour of qzmq</a>
+&emsp;<a href="#toc2-229">Issues</a>
+&emsp;<a href="#toc2-233"></a>
 
-<A name="toc2-21" title="Features of qzmq" />
+<A name="toc2-25" title="Features of qzmq" />
 ## Features of qzmq
 qzmq lets Q users write
 
@@ -35,12 +39,12 @@ qzmq lets Q users write
     - written with many software patterns,
 -  developed by the [ØMQ][zeromq] community.
 
-<A name="toc2-31" title="License" />
+<A name="toc2-35" title="License" />
 ## License
 
-Dual license:
+Dual licenses:
 
-- Affero GPL
+- the GNU Affero General Public License version 3
 - More permissible licenses (TBD)
 
 Copyright (c) 2012 Jaeheum Han
@@ -49,7 +53,7 @@ This file is part of qzmq.
 
 qzmq is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-<A name="toc2-45" title="Files of qzmq" />
+<A name="toc2-49" title="Files of qzmq" />
 ## Files of qzmq
 
 * COPYING -- GNU Affero General Public License.
@@ -65,11 +69,11 @@ qzmq is free software: you can redistribute it and/or modify it under the terms 
 * qzmq.so -- dynamic library to be loaded into q by `qzmq.q`.
 * qzmq_test.q -- test code translated to q from CZMQ's self-test code.
 
-<A name="toc2-61" title="Building qzmq" />
+<A name="toc2-65" title="Building qzmq" />
 ## Building qzmq
-Prerequisites: [ØMQ][zeromq] 2.2, [CZMQ][czmq] 1.2.0. See [`how-to-install-zeromq-czmq.md`](./how-to-install-zeromq-czmq.md) for installation instructions.
+Prerequisites: kdb+ 2.8 or 3.0 (32-bit) for Linux and Mac, [ØMQ][zeromq] 2.2, [CZMQ][czmq] 1.2.0. Follow `how-to-install-zeromq-czmq.md` or `how-to-install-zeromq-czmq.txt` to install ZeroMQ and CZMQ.
 
-Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10.7.5, RHEL/CentOS 6, and Ubuntu 12.04.
+Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10.7.5, RHEL/CentOS 6, and Ubuntu 12.04. Instructions for builidng qzmq assumes kdb+ is instaled under `$HOME/q/` directory.
 
     # for Mac OS X (kdb+ v2.8 "m32")
     gcc -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
@@ -78,14 +82,14 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
         -L./kx/kdb+2.8/m32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v2.8 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
+    # for RHEL6, CentOS 6, etc. (kdb+ v2.8 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
         -I./kx/kdb+2.8  -I/usr/include/ \
         -L./kx/kdb+2.8/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for Debian, Ubuntu, ... (kdb+ v2.8 "l32") wtih ZeroMQ & CZMQ in /usr/local/lib, built from the source.
+    # for Debian, Ubuntu, ... (kdb+ v2.8 "l32") with ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
         -I./kx/kdb+2.8  -I/usr/local/include/ \
@@ -99,21 +103,21 @@ Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10
         -L./kx/kdb+3.0/m32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for RHEL6, CentOS 6, SUSE, etc. (kdb+ v3.0 "l32")
+    # for RHEL6, CentOS 6, etc. (kdb+ v3.0 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
         -I./kx/kdb+3.0  -I/usr/include/ \
         -L./kx/kdb+3.0/l32 -L/usr/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
 
-    # for Debian, Ubuntu, ... (kdb+ v3.0 "l32")
+    # for Debian, Ubuntu, ... (kdb+ v3.0 "l32") with ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
         -I./kx/kdb+3.0/l32  -I/usr/local/include/ \
         -L./kx/kdb+3.0/l32 -L/usr/local/lib -lzmq -lczmq
     cp qzmq.q $HOME/q/
     
-<A name="toc2-109" title="A Quick Tour of qzmq" />
+<A name="toc2-113" title="A Quick Tour of qzmq" />
 ## A Quick Tour of qzmq
 
 Load qzmq; learn to read online documentation; write multi-threading code in q; ...
@@ -220,7 +224,7 @@ Load qzmq; learn to read online documentation; write multi-threading code in q; 
     "  171        172         0.0 S    31T   0:00.00   0:00.00 "
     ..
 
-<A name="toc2-216" title="A Longer Tour of qzmq" />
+<A name="toc2-220" title="A Longer Tour of qzmq" />
 ## A Longer Tour of qzmq
 
 `qzmq_test.q` contains qzmq translation of czmq's self-tests. It can be used as examples of each API.
@@ -229,10 +233,10 @@ Code in `demos/*` shows cross-language clients and servers that are interchangea
 
 ZeroMQ [Guide][zguide] has examples in many languages. Translation of these examples to q is [under way](https://github.com/imatix/zguide/tree/master/examples/Q)  (pulled from [here](https://github.com/jaeheum/zguide/tree/master/examples/Q)). See [Issue #5](https://github.com/jaeheum/qzmq/issues/5).
 
-<A name="toc2-225" title="Issues" />
+<A name="toc2-229" title="Issues" />
 ## Issues
 See the [issue tracker][issues].
-<A name="toc2-229" title="" />
+<A name="toc2-233" title="" />
 
 ---
 
