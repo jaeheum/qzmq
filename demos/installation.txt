@@ -42,18 +42,18 @@ One quick check for successful installation:
 
     $ perl -e 'use ZeroMQ qw/:all/; print "ZeroMQ version is: " . ZeroMQ::version() . "\n";'
     ZeroMQ version is: 2.2.0
+
+Perl demo scripts also need additional modules that can be installed by:
+
+    sudo cpan -i Digest::SHA1
+    sudo cpan -i Module::Build
+    sudo cpan -i String::Random
     
 ## Java
 Currently the demo does not include any Java code.
 
 See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) for installation instructions and documentation of Java bindings.
 
-## Misc
-
-    yum install nc
-    cpan -i Digest::SHA1
-    cpan -i Module::Build
-    cpan -i String::Random
 
 .- Reference
 .-

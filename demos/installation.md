@@ -1,6 +1,6 @@
 
 Title: demo/installation
-Date: 20121013
+Date: 20121019
 
 <A name="toc1-5" title="Contents" />
 # Contents
@@ -11,8 +11,7 @@ Date: 20121013
 &emsp;<a href="#toc2-19">Q</a>
 &emsp;<a href="#toc2-23">Python</a>
 &emsp;<a href="#toc2-40">Perl</a>
-&emsp;<a href="#toc2-51">Java</a>
-&emsp;<a href="#toc2-57">Misc</a>
+&emsp;<a href="#toc2-57">Java</a>
 
 <A name="toc1-10" title="Installing ZeroMQ Language Bindings" />
 # Installing ZeroMQ Language Bindings
@@ -54,20 +53,19 @@ One quick check for successful installation:
 
     $ perl -e 'use ZeroMQ qw/:all/; print "ZeroMQ version is: " . ZeroMQ::version() . "\n";'
     ZeroMQ version is: 2.2.0
+
+Perl demo scripts also need additional modules that can be installed by:
+
+    sudo cpan -i Digest::SHA1
+    sudo cpan -i Module::Build
+    sudo cpan -i String::Random
     
-<A name="toc2-51" title="Java" />
+<A name="toc2-57" title="Java" />
 ## Java
 Currently the demo does not include any Java code.
 
 See [http://www.zeromq.org/bindings:java](http://www.zeromq.org/bindings:java) for installation instructions and documentation of Java bindings.
 
-<A name="toc2-57" title="Misc" />
-## Misc
-
-    yum install nc
-    cpan -i Digest::SHA1
-    cpan -i Module::Build
-    cpan -i String::Random
 
 [qzmq]: https://github.com/jaeheum/qzmq
 [issues]: https://github.com/jaeheum/qzmq/issues
