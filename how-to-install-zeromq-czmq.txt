@@ -18,15 +18,28 @@ See [http://www.zeromq.org/distro:_start](http://www.zeromq.org/distro:_start)
 See [http://www.zeromq.org/distro:centos](http://www.zeromq.org/distro:centos)
 
 As root, first [add a repository][yum] holding the ZeroMQ 2.2 to `yum`, then run `yum` to install ZeroMQ and CZMQ.
+    
+    # in case basic necessity is missing in the OS
+    sudo yum -t -y -e 0 update
+    sudo yum -y install gcc
+    sudo yum -y install gcc-c++
+    sudo yum -y install glibc-devel libgcc
+    sudo yum -y install git
+    sudo yum -y install unzip
+    sudo yum -y install screen
 
+    # if the OS has basic necessity already installed, go ahead:
+    sudo yum -y install glibc-devel.i686 libgcc.i686 # 32-bit headers
+    sudo yum -y install yum-utils # for yum-config-manager
+    # add a repo that has ZeroMQ 2.2.0 and CZMQ 1.2.0
     sudo yum-config-manager --add-repo http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo
-    sudo yum install zeromq.i686 # do.it is it i686 or i586?
+    sudo yum install zeromq.i686
     sudo yum install zeromq-devel.i686
     sudo yum install zeromq
     sudo yum install zeromq-devel
     sudo yum install libczmq.i686
-    sudo yum install libczmq
     sudo yum install libczmq-devel.i686
+    sudo yum install libczmq
     sudo yum install libczmq-devel
 
 `man zmq` and it should display 0MQ 2.2.0 at the bottom of the man page; `man czmq` CZMQ 1.2.0.
