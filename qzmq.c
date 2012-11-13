@@ -381,7 +381,7 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "size", zmsgsize, 1, "returns number of zframes in the zmsg x."},
     {"zmsg", "content_size", zmsgcontentsize, 1, "returns the combined size of all zframes in the zmsg x."},
     {"zmsg", "push", zmsgpush, 2, "pushes the zframe y to the front of the zmsg x."},
-    {"zmsg", "pop", zmsgpop, 1, "pops the zframe y from the front of the zmsg x or raises 'empty."},
+    {"zmsg", "pop", zmsgpop, 1, "pops a zframe from the front of the zmsg x or raises 'empty."},
     {"zmsg", "add", zmsgadd, 2, "adds the zframe y to the end of the zmsg x."},
     {"zmsg", "pushmem", zmsgpushmem, 0, "nyi."},
     {"zmsg", "addmem", zmsgaddmem, 0, "nyi."},
