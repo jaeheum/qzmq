@@ -46,7 +46,7 @@ ZK ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. v
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
 #define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // x->n may be unset for n=1.
-ZK qstr(S s){R s!=NULL?kp(s):(K)0;}
+ZK qstr(S s){K str=(s!=NULL)?kp(s):(K)0; free(s); R str;}
 #define TC(x,T) P(x->t!=T,krr("type")) // typechecker
 #define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
 #define IC(x) P(x->t==-KJ&&x->j>wi,krr("type"));if(x->t==-KJ)x=ki((int)x->j); // j from i (=<0Wi).
@@ -271,10 +271,10 @@ Z K2(zsocketsethwm){PC(x); TC2(y,-KI,-KJ); IC(y); zsocket_set_hwm(VSK(x), yi); R
 
 // send/receive q char vector (not for byte vectors or serialized objects)
 // zstr_recv* returns C string with a trailing \0. Convert it to q char vector and free the poor thing.
-Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
-Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); K qs=qstr(s); if(s)free(s); R qs;}
-Z K2(zstrsend){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_send(VSK(x), s));}
-Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); r1(y); CSTR(y); R ki(zstr_sendm(VSK(x), s));}
+Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x));  R qstr(s);}
+Z K1(zstrrecvnowait){PC(x); S s=zstr_recv_nowait(VSK(x)); R qstr(s);}
+Z K2(zstrsend){PC(x); TC2(y,KC,-KC); CSTR(y); R ki(zstr_send(VSK(x), s));}
+Z K2(zstrsendm){PC(x); TC2(y,KC,-KC); CSTR(y); R ki(zstr_sendm(VSK(x), s));}
 
 // three-tier implementation of zthread:
 // - user-visible API zthread_new and zthread_fork take a q worker function named  by a -11h.
