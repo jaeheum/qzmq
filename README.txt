@@ -7,8 +7,9 @@ Date: &date()
 
 qzmq provides [Q][q] bindings for [CZMQ][czmq], the high-level C binding for [ØMQ][zeromq].
 
-This is version 1.2.0-RC2 of qzmq.
+This is version 1.2.0-RC3 of qzmq.
 
+- 1.2.0-RC3: benchmarks added in `perf/`; new `assert.q` utilities
 - 1.2.0-RC2: installation instructions for RHEL6/CentOS6, Ubuntu, Mac OS X
 - 1.2.0-RC1: documentation added
 - 1.2.0-RC0: CZMQ 1.2.0 support
@@ -37,7 +38,7 @@ Dual licenses:
 - the GNU Affero General Public License version 3
 - More permissible licenses (TBD)
 
-Copyright (c) 2012 Jaeheum Han
+Copyright (c) 2012, 2013 Jaeheum Han
 
 This file is part of qzmq.
 
@@ -61,49 +62,49 @@ qzmq is free software: you can redistribute it and/or modify it under the terms 
 ## Building qzmq
 Prerequisites: kdb+ 2.8 or 3.0 (32-bit) for Linux and Mac, [ØMQ][zeromq] 2.2, [CZMQ][czmq] 1.2.0. Follow `how-to-install-zeromq-czmq.md` or `how-to-install-zeromq-czmq.txt` to install ZeroMQ and CZMQ.
 
-Current version 1.2.0-RC0 of qzmq has been built with 32-bit kdb+ on Mac OS X 10.7.5, RHEL/CentOS 6, and Ubuntu 12.04. Instructions for builidng qzmq assumes kdb+ is instaled under `$HOME/q/` directory.
+Current version 1.2.0-RC3 of qzmq has been built with 32-bit kdb+ on Mac OS X 10.7.5, RHEL/CentOS 6, and Ubuntu 12.04. Instructions for builidng qzmq assumes kdb+ is instaled under `$HOME/q/` directory.
 
     # for Mac OS X (kdb+ v2.8 "m32")
     gcc -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
         -Wall -Wextra \
         -I./kx/kdb+2.8  -I/usr/local/include/ \
         -L./kx/kdb+2.8/m32 -L/usr/local/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
 
     # for RHEL6, CentOS 6, etc. (kdb+ v2.8 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
         -I./kx/kdb+2.8  -I/usr/include/ \
         -L./kx/kdb+2.8/l32 -L/usr/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
 
     # for Debian, Ubuntu, ... (kdb+ v2.8 "l32") with ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
         -I./kx/kdb+2.8  -I/usr/local/include/ \
         -L./kx/kdb+2.8/l32 -L/usr/local/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
 
     # for Mac OS X (kdb+ v3.0 "m32")
     gcc -DKXVER=3  -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
         -Wall -Wextra \
         -I./kx/kdb+3.0  -I/usr/local/include/ \
         -L./kx/kdb+3.0/m32 -L/usr/local/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
 
     # for RHEL6, CentOS 6, etc. (kdb+ v3.0 "l32") with prebuilt ZeroMQ & CZMQ in /usr/lib
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/lib \
         -I./kx/kdb+3.0  -I/usr/include/ \
         -L./kx/kdb+3.0/l32 -L/usr/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
 
     # for Debian, Ubuntu, ... (kdb+ v3.0 "l32") with ZeroMQ & CZMQ in /usr/local/lib, built from the source.
     gcc -DKXVER=3 -m32 -shared -fPIC qzmq.c -o $HOME/q/l32/qzmq.so \
         -Wall -Wextra  -Wl,-rpath -Wl,/usr/local/lib \
-        -I./kx/kdb+3.0/l32  -I/usr/local/include/ \
+        -I./kx/kdb+3.0 -I/usr/local/include/ \
         -L./kx/kdb+3.0/l32 -L/usr/local/lib -lzmq -lczmq
-    cp qzmq.q $HOME/q/
+    cp qzmq.q assert.q $HOME/q/
     
 ## A Quick Tour of qzmq
 

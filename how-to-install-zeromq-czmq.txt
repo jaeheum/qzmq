@@ -75,6 +75,10 @@ See [http://www.zeromq.org/intro:get-the-software](http://www.zeromq.org/intro:g
 
     ./configure && make && sudo make install
 
+N.B. If you're using the freely downloadable trial copy of kdb+, note that it is 32-bit only and you need to compile ZeroMQ and CZMQ in 32-bit mode:
+
+    ./configure CFLAGS=-m32 && make && sudo make install
+
 .- Reference
 .-
 [qzmq]: $(GIT)
