@@ -2,10 +2,14 @@ flags:.Q.def[`url`size`count!(`$"inproc://lat_test"; 30; 1000*1000)].Q.opt .z.x
 \l assert.q
 \l qzmq.q
 
+snd:zstr.send
+rcv:zstr.recv
+N:flags`count
+
 worker:{[args; ctx; pipe]
     rep:zsocket.new[ctx; zmq`REP];
     port:zsocket.connect[rep; flags`url];
-    do[flags`count; zstr.send[rep; zstr.recv[rep]]]}
+    do[N; snd[rep; rcv[rep]]]}
 
 ctx:zctx.new[]
 req:zsocket.new[ctx; zmq`REQ]
@@ -13,11 +17,11 @@ port:zsocket.bind[req; flags`url]
 pipe:zthread.fork[ctx; `worker; 0N]
 msg:(flags`size)#"0"
 starttime:zclock.time[]
-do[flags`count; zstr.send[req; msg]; zstr.recv[req]]
+do[N; snd[req; msg]; rcv[req]]
 elapsed:zclock.time[]-starttime
 show"message size: ", (string flags`size), " [B]"
-show"roundtrip count: ", (string flags`count)
-show"average latency: ", (string (elapsed%(2*flags`count))*1000), " [us]"
+show"roundtrip count: ", (string N)
+show"average latency: ", (string (elapsed%(2*N))*1000), " [us]"
 
 zsocket.destroy[ctx; pipe]
 zctx.destroy[ctx]

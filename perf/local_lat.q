@@ -2,13 +2,17 @@ flags:.Q.def[`url`size`count!(`$"tcp://*:55555"; 30; 1000*1000)].Q.opt .z.x
 \l assert.q
 \l qzmq.q
 
+snd:zstr.send
+rcv:zstr.recv
+N:flags`count
+
 ctx:zctx.new[]
 rep:zsocket.new[ctx; zmq`REP]
 port:zsocket.bind[rep; flags`url]
 starttime:zclock.time[]
-do[flags`count; zstr.send[rep; zstr.recv[rep]]]
+do[N; snd[rep; rcv[rep]]]
 elapsed:zclock.time[]-starttime
-latency:elapsed%(flags.count*2)
+latency:elapsed%(N*2)
 show "mean latency: ",(string latency*1000)," [us]"
 zsocket.destroy[ctx; rep]
 zctx.destroy[ctx]

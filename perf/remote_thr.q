@@ -1,14 +1,19 @@
 flags:.Q.def[`url`size`count!(`tcp://127.0.0.1:55555; 30; 1000*1000)].Q.opt .z.x
 
 \l qzmq.q
+
+snd:zstr.send
+rcv:zstr.recv
+N:flags`count
+
 ctx:zctx.new[]
 pub:zsocket.new[ctx; zmq`PUB]
 port:zsocket.connect[pub; flags`url]
 msg:flags.size#"0"
 starttime:zclock.time[]
-do[flags`count; zstr.send[pub; msg]]
+do[N; snd[pub; msg]]
 elapsed:zclock.time[]-starttime
-throughput:flags.count%(elapsed%1000)
+throughput:N%(elapsed%1000)
 megabits:throughput*flags.size*8%(1000*1000)
 zsocket.destroy[ctx; pub]
 zctx.destroy[ctx]

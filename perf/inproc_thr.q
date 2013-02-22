@@ -4,16 +4,18 @@ flags:.Q.def[`url`size`count!(`$"inproc://thr_test"; 30; 1000*1000)].Q.opt .z.x
 
 snd:zstr.send
 rcv:zstr.recv
+N:flags`count
+
 worker:{[args; ctx; pipe]
     msg:(flags`size)#"0";
     pub:zsocket.new[ctx; zmq`PUB];
     port:zsocket.connect[pub; flags`url];
     ae["ready"; zstr.recv[pipe]];
     starttime:zclock.time[];
-    do[N; zstr.send[pub; msg]];
+    do[N; snd[pub; msg]];
     elapsed:zclock.time[]-starttime;
     / show "send elapsed time: ",(string elapsed), " [ms]";
-    throughput:(flags`count)%(elapsed%1000);
+    throughput:N%(elapsed%1000);
     megabits:throughput*(flags`size)*8%(1000*1000);
     show "send mean throughput: ",(string throughput)," [msg/s]";
     show "send mean throughput: ", (string megabits)," [Mb/s]"}
@@ -22,15 +24,13 @@ ctx:zctx.new[]
 sub:zsocket.new[ctx; zmq`SUB]
 zsockopt.set_subscribe[sub; `$""]
 port:zsocket.bind[sub; flags`url]
-N:flags`count
 pipe:zthread.fork[ctx; `worker; 0N]
 ae[0i; zstr.send[pipe; "ready"]]
 show "message size: ", (string flags`size), " [B]"
 show "message count: ", (string flags`count)
 starttime:zclock.time[]
-do[flags`count; rcv[sub]]
+do[N; rcv[sub]]
 elapsed:zclock.time[]-starttime
-/ show "elapsed time: ",(string elapsed), " [ms]"
 throughput:(flags`count)%(elapsed%1000)
 megabits:throughput*(flags`size)*8%(1000*1000)
 show "mean throughput: ",(string throughput)," [msg/s]"
