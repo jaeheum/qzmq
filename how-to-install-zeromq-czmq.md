@@ -1,6 +1,6 @@
 
 Title: how-to-install-zeromq-czmq
-Date: 20121019
+Date: 20130125
 
 <A name="toc1-5" title="Install ZeroMQ and CZMQ" />
 # Install ZeroMQ and CZMQ
@@ -82,6 +82,10 @@ See [http://www.zeromq.org/distro:microsoft-windows](http://www.zeromq.org/distr
 See [http://www.zeromq.org/intro:get-the-software](http://www.zeromq.org/intro:get-the-software) -- you need to have modern day development tools like  libtool, autoconf, automake and gcc tool-chain.
 
     ./configure && make && sudo make install
+
+N.B. If you're using the freely downloadable trial copy of kdb+, note that it is 32-bit only and you need to compile ZeroMQ and CZMQ in 32-bit mode:
+
+    ./configure CFLAGS=-m32 && make && sudo make install
 
 [qzmq]: https://github.com/jaeheum/qzmq
 [issues]: https://github.com/jaeheum/qzmq/issues
