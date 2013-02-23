@@ -7,8 +7,9 @@ Date: &date()
 
 qzmq provides [Q][q] bindings for [CZMQ][czmq], the high-level C binding for [ØMQ][zeromq].
 
-This is version 1.2.0-RC3 of qzmq.
+This is version 1.2.0-RC4 of qzmq.
 
+- 1.2.0-RC4: benchmark optimization
 - 1.2.0-RC3: benchmarks added in `perf/`; new `assert.q` utilities
 - 1.2.0-RC2: installation instructions for RHEL6/CentOS6, Ubuntu, Mac OS X
 - 1.2.0-RC1: documentation added
@@ -62,7 +63,7 @@ qzmq is free software: you can redistribute it and/or modify it under the terms 
 ## Building qzmq
 Prerequisites: kdb+ 2.8 or 3.0 (32-bit) for Linux and Mac, [ØMQ][zeromq] 2.2, [CZMQ][czmq] 1.2.0. Follow `how-to-install-zeromq-czmq.md` or `how-to-install-zeromq-czmq.txt` to install ZeroMQ and CZMQ.
 
-Current version 1.2.0-RC3 of qzmq has been built with 32-bit kdb+ on Mac OS X 10.7.5, RHEL/CentOS 6, and Ubuntu 12.04. Instructions for builidng qzmq assumes kdb+ is instaled under `$HOME/q/` directory.
+Current version 1.2.0-RC4 of qzmq has been built with 32-bit kdb+ on Ubuntu 12.10. Instructions for builidng qzmq assumes kdb+ is instaled under `$HOME/q/` directory.
 
     # for Mac OS X (kdb+ v2.8 "m32")
     gcc -m32 -bundle -undefined dynamic_lookup qzmq.c -o $HOME/q/m32/qzmq.so \
