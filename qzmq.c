@@ -45,20 +45,22 @@ ZK ptr(V*x){if(x){R kj((intptr_t)x);}else{R(K)0;}} // K from opaque types e.g. v
 #define ZTK(t,v) t*v=(t*)(intptr_t)(x->j)
 #define KRR(x) krr(strerror(x))
 #define CRE(x) {I r=(x);P(r!=0,KRR(errno));}
-#define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]=0;}else{s=(S)&TX(G,x);s[1]=0;} // x->n may be unset for n=1.
+#define CSTR(x) S s;if(x->t>0){s=(S)kC(x);s[x->n]='\0';}else{s=(S)&TX(G,x);s[1]='\0';} // x->n may be unset for n=1.
 ZK qstr(S s){K str=(s!=NULL)?kp(s):(K)0; free(s); R str;}
 #define TC(x,T) P(x->t!=T,krr("type")) // typechecker
 #define TC2(x,T,T2) P(x->t!=T&&x->t!=T2,krr("type"))
 #define IC(x) P(x->t==-KJ&&x->j>wi,krr("type"));if(x->t==-KJ)x=ki((int)x->j); // j from i (=<0Wi).
 #define PC(x) TC(x,-KJ) // pointer check; implementation dependent -- see ptr(V*).
 ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
+// this macro was defined in czmq_prelude.h before 1.4 until fd79227edf2b18136bd0d1e246382f01c9e7c635 1 parent 74f8307
+#define tblsize(x)      (sizeof (x) / sizeof ((x) [0]))
 
 Z K1(zclocksleep){TC2(x,-KI,-KJ); IC(x); zclock_sleep(xi); R(K)0;}
 Z K0(zclocktime){R(kj(zclock_time()));}
 Z K1(zclocklog){TC(x,KC); CSTR(x); zclock_log(s); R(K)0;}
 
-Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);} 
-Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;} 
+Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);}
+Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); R(K)0;}
 Z K2(zctxsetiothreads){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_iothreads(VSK(x), yi); R(K)0;}
 Z K2(zctxsetlinger){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_linger(VSK(x), yi); R(K)0;}
 Z K2(zctxsethwm){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_hwm(VSK(x), yi); R(K)0;}
@@ -131,7 +133,7 @@ ZI timer_loop_fn(zloop_t*loop, zmq_pollitem_t*item, V*args){
     if(xt==-128){O("k() error: %s\n", xs);}
     R xi;}
 // zloop_timer (zloop_t *self, size_t delay, size_t times, zloop_fn handler, void *arg)
-Z K5(zlooptimer){PC(x); TC2(y,-KI,-KJ); TC2(z,-KI,-KJ); TC(z4,-KS); 
+Z K5(zlooptimer){PC(x); TC2(y,-KI,-KJ); TC2(z,-KI,-KJ); TC(z4,-KS);
     ZTK(zloop_t,loop); settimerfn(z4); R ki(zloop_timer(loop, yj, zj, timer_loop_fn, z5));}
 Z K2(zlooptimerend){PC(x); PC(y); zloop_timer_end(VSK(x), VSK(y)); R(K)0;}
 Z K2(zloopsetverbose){PC(x); TC(y,-KB); ZTK(zloop_t,loop); zloop_set_verbose(loop, y->g); R(K)0;}
@@ -178,7 +180,7 @@ Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
 Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{free(s); R KRR(errno);}}
-        else{R krr("malloc");}} 
+        else{R krr("malloc");}}
 Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
 Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
 Z K1(zsocketrecovery_ivl_msec){PC(x); R ki(zsocket_recovery_ivl_msec(VSK(x)));}
@@ -230,7 +232,7 @@ Z K1(zsocketaffinity){PC(x); R ki(zsocket_affinity(VSK(x)));}
 Z K1(zsocketidentity){PC(x); size_t n=255; S s=(S)malloc(n); I r; K id;
     if(s){r=zmq_getsockopt(VSK(x), ZMQ_IDENTITY, s, &n);
         if(r==0){id=kpn(s,n); free(s); R r1(id);}else{free(s); R KRR(errno);}}
-        else{R krr("malloc");}} 
+        else{R krr("malloc");}}
 Z K1(zsocketrate){PC(x); R ki(zsocket_rate(VSK(x)));}
 Z K1(zsocketrecovery_ivl){PC(x); R ki(zsocket_recovery_ivl(VSK(x)));}
 Z K1(zsocketsndbuf){PC(x); R ki(zsocket_sndbuf(VSK(x)));}
@@ -310,7 +312,7 @@ ZV af(V*args, zctx_t*ctx, V*pipe){
     if(xt==-128){O("k() error: %s\n", xs);}
     r0(x); m9();}
 // void* zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
-Z K3(zthreadfork){PC(x); TC(y,-KS); 
+Z K3(zthreadfork){PC(x); TC(y,-KS);
     r1(y);
     setattachedfn(y);
     V*pipe=zthread_fork(VSK(r1(x)), af, r1(z));
