@@ -48,14 +48,35 @@ ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
 #define D(x)
 #endif
 
+//zactor
+ZK actorfn;
+sem_t actorfn_sem;
+//typedef void (zactor_fn) (zsock_t *pipe, void *args);
+ZV task(zsock_t *pipe, void *args){
+    sem_post(&actorfn_sem);
+    K x=dot(actorfn, knk(2, ptr(pipe), d9(args)));
+    if(xt==-128){O("k() error: %s\n", xs);}
+    r0(x);
+    m9(); R;}
+// zactor_new(zactor_fn *task, void *args)
+Z K2(zactornew){
+    sem_init(&actorfn_sem,0,0);
+    actorfn=x;
+    zactor_t*a=zactor_new(task,b9(-1,y));
+    sem_wait(&actorfn_sem);
+    sem_destroy(&actorfn_sem);
+    if(a){R ptr(a);}else{R krr("zactor_new");}
+}
+Z K1(zactordestroy){PC(x); ZTK(zactor_t,a); zactor_destroy(&a); RZ;}
+Z K2(zactorsend){PC(x); PC(y); zmsg_t*m=(zmsg_t*)(intptr_t)(y->j);
+    R kj(zactor_send(VSK(x), &m));}
+Z K1(zactorrecv){PC(x); R ptr(zactor_recv(VSK(x)));}
+Z K1(zactoris){PC(x); R kb(zactor_is(VSK(x)));}
+Z K1(zactorresolve){PC(x); R ptr(zactor_resolve(VSK(x)));}
+Z K1(zactorsock){PC(x); R ptr(zactor_sock(VSK(x)));}
+
 //zclock (kept for zthread & testing)
 Z K1(zclocksleep){TC2(x,-KI,-KJ); IC(x); zclock_sleep(xi); RZ;}
-
-//zfile `:path (kept for zthread & testing)
-Z K1(zfiledelete){TC(x,-KS); R kj(zfile_delete(++xs));}
-Z K1(zfilemkdir){TC(x,-KS); R kj(zfile_mkdir(++xs));}
-Z K1(zfileexists){TC(x,-KS); R kj(zfile_exists(++xs));}
-Z K1(zfilesize){TC(x,-KS); R kj(zfile_size(++xs));}
 
 //zctx (kept for zthread)
 Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);}
@@ -63,6 +84,12 @@ Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); RZ;}
 Z K2(zctxsetiothreads){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_iothreads(VSK(x), yi); RZ;}
 Z K2(zctxsetlinger){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_linger(VSK(x), yi); RZ;}
 Z K0(zctxinterrupted){R kb(zctx_interrupted);}
+
+//zfile `:path (kept for zthread & testing)
+Z K1(zfiledelete){TC(x,-KS); R kj(zfile_delete(++xs));}
+Z K1(zfilemkdir){TC(x,-KS); R kj(zfile_mkdir(++xs));}
+Z K1(zfileexists){TC(x,-KS); R kj(zfile_exists(++xs));}
+Z K1(zfilesize){TC(x,-KS); R kj(zfile_size(++xs));}
 
 //zframe
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
@@ -92,6 +119,16 @@ Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
 Z K2(zmsgprepend){PC(x); PC(y); zframe_t*f=(zframe_t*)(intptr_t)yj;  R kj(zmsg_prepend(VSK(x), &f));}
 Z K2(zmsgappend){PC(x); PC(y); zframe_t*f=(zframe_t*)(intptr_t)yj;  zmsg_append(VSK(x), &f); RZ;}
 Z K1(zmsgpop){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_pop(VSK(x)))); R krr("empty");}
+
+Z K1(zmsgpushmem){PC(x); R krr("nyi");}
+Z K1(zmsgaddmem){PC(x); R krr("nyi");}
+
+Z K2(zmsgpushstr){PC(x); R kj(zmsg_pushstr(VSK(x), ys));}
+Z K2(zmsgaddstr){PC(x); R kj(zmsg_addstr(VSK(x), ys));}
+Z K2(zmsgpushstrf){PC(x); R krr("nyi");}
+Z K2(zmsgaddstrf){PC(x); R krr("nyi");}
+Z K1(zmsgpopstr){PC(x); R ks(zmsg_popstr(VSK(x)));}
+
 Z K1(zmsgfirst){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
 Z K1(zmsgnext){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
 Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
@@ -116,13 +153,28 @@ Z K1(zsocknewpair){R ptr(zsock_new_pair(xs));}
 Z K1(zsocknewstream){R ptr(zsock_new_stream(xs));}
 Z K1(zsockdestroy){PC(x); ZTK(zsock_t,s); zsock_destroy(&s); RZ;}
 Z K2(zsockbind){PC(x); TC(y,-KS); R kj(zsock_bind(VSK(x),ys));}
+Z K1(zsockendpoint){PC(x); R ks((const S)zsock_endpoint(VSK(x)));}
+Z K2(zsockunbind){PC(x); TC(y,-KS); R kj(zsock_unbind(VSK(x),ys));}
 Z K2(zsockconnect){PC(x); TC(y,-KS); R kj(zsock_connect(VSK(x),ys));}
+Z K2(zsockdisconnect){PC(x); TC(y,-KS); R kj(zsock_disconnect(VSK(x),ys));}
+Z K3(zsockattach){PC(x); TC(y,-KS); R kj(zsock_attach(VSK(x),ys, z->g));}
 Z K1(zsocktypestr){PC(x); R ks((const S)zsock_type_str(VSK(x)));}
-
+Z K2(zsocksend){PC(x); TC(y,-KS); R kj(zsock_send(VSK(x), ys));}
+Z K2(zsockrecv){PC(x); TC(y,-KS); R kj(zsock_recv(VSK(x), ys));}
+Z K2(zsockbsend){PC(x); TC(y,-KS); R kj(zsock_bsend(VSK(x), ys));}
+Z K2(zsockbrecv){PC(x); TC(y,-KS); R kj(zsock_brecv(VSK(x), ys));}
+Z K1(zsocksetunbounded){PC(x);zsock_set_unbounded(VSK(x)); RZ;}
+Z K2(zsocksignal){PC(x); R kj(zsock_signal(VSK(x), y->g));}
+Z K1(zsockwait){PC(x); R kj(zsock_wait(VSK(x)));}
+Z K1(zsockflush){PC(x); zsock_flush(VSK(x)); RZ;}
+Z K1(zsockis){PC(x); R kb(zsock_is(VSK(x)));}
+Z K1(zsockresolve){PC(x); R ptr(zsock_resolve(VSK(x)));}
 //zstr
 Z K1(zstrrecv){PC(x); R r1(ks(zstr_recv(VSK(x))));}
 Z K1(zstrfree){zstr_free(&xs); r0(x); RZ;}
 Z K2(zstrsend){PC(x); R kj(zstr_send(VSK(x), ys));}
+Z K2(zstrsendm){PC(x); R kj(zstr_sendm(VSK(x), ys));}
+Z K3(zstrsendx){PC(x); R kj(zstr_sendx(VSK(x), ys, z->s, NULL));}
 
 //zsys
 Z K1(zsyserror){zsys_error(xs); RZ;}
@@ -194,6 +246,15 @@ Z K3(device){TC2(x,-KI,-KJ); IC(x); PC(y); PC(z); R kj(zmq_device(xi, VSK(y), VS
 
 // apiname because reflection is impossible.
 typedef struct {S apiname; S fnname; V* fn; I argc;} czmqzpi;
+Z czmqzpi zactorapi[]={
+    {"zactor", "new", zactornew, 2},
+    {"zactor", "destroy", zactordestroy, 1},
+    {"zactor", "send", zactorsend, 2},
+    {"zactor", "recv", zactorrecv, 1},
+    {"zactor", "is", zactoris, 1},
+    {"zactor", "resolve", zactorresolve, 1},
+    {"zactor", "sock", zactorsock, 1},
+    {NULL,NULL,NULL,0}};    
 Z czmqzpi zctxapi[]={
     {"zctx", "new", zctxnew, 0},
     {"zctx", "destroy", zctxdestroy, 1},
@@ -236,6 +297,14 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "prepend", zmsgprepend, 2},
     {"zmsg", "append", zmsgappend, 2},
     {"zmsg", "pop", zmsgpop, 1},
+    {"zmsg", "pushmem", zmsgpushmem, 1},
+    {"zmsg", "addmem", zmsgaddmem, 1},
+    {"zmsg", "pushstr", zmsgpushstr, 1},
+    {"zmsg", "addstr", zmsgaddstr, 1},
+    {"zmsg", "pushstrf", zmsgpushstrf, 1},
+    {"zmsg", "addstrf", zmsgaddstrf, 2},
+    {"zmsg", "popstr", zmsgpopstr, 1},
+
     {"zmsg", "first", zmsgfirst, 1},
     {"zmsg", "next", zmsgnext, 1},
     {"zmsg", "last", zmsglast, 1},
@@ -260,13 +329,29 @@ Z czmqzpi zsockapi[]={
     {"zsock", "new_stream", zsocknewstream, 1},
     {"zsock", "destroy", zsockdestroy, 1},
     {"zsock", "bind", zsockbind, 2},
+    {"zsock", "unbind", zsockunbind, 2},
     {"zsock", "connect", zsockconnect, 2},
-    {"zsock", "type_sym", zsocktypestr, 1},
+    {"zsock", "endpoint", zsockendpoint, 1},
+    {"zsock", "disconnect", zsockdisconnect, 2},
+    {"zsock", "attach", zsockattach, 2},
+    {"zsock", "type_str", zsocktypestr, 2},
+    {"zsock", "send", zsocksend, 1},
+    {"zsock", "recv", zsockrecv, 1},
+    {"zsock", "bsend", zsockbsend, 1},
+    {"zsock", "brecv", zsockbrecv, 1},
+    {"zsock", "set_unbounded", zsocksetunbounded, 1},
+    {"zsock", "signal", zsocksignal, 2},
+    {"zsock", "wait", zsockwait, 1},
+    {"zsock", "flush", zsockflush, 1},
+    {"zsock", "is", zsockis, 1},
+    {"zsock", "resolve", zsockresolve, 1},
     {NULL,NULL,NULL,0}};
 Z czmqzpi zstrapi[]={
     {"zstr", "recv", zstrrecv, 1},
     {"zstr", "free", zstrfree, 1},
     {"zstr", "send", zstrsend, 2},
+    {"zstr", "sendm", zstrsendm, 2},
+    {"zstr", "sendx", zstrsendx, 3},
     {NULL,NULL,NULL,0}};
 Z czmqzpi zthreadapi[] = {
     {"zthread", "new", zthreadnew, 2},
@@ -291,6 +376,7 @@ Z czmqzpi zsysapi[]={
     DO(n, APITAB(name##api[i].fnname, name##api[i].fn, name##api[i].argc)); \
     R xD(x,y);}
 
+EXPAPI(zactor);
 EXPAPI(zctx);
 EXPAPI(zclock);
 EXPAPI(zfile);

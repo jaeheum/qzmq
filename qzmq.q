@@ -1,6 +1,7 @@
 / Set port to a random negative number for multithreaded input.
 / \p -0W
 zmq:(`qzmq 2:(`zmq;1))`
+zactor:(`qzmq 2:(`zactor;1))`
 zctx:(`qzmq 2:(`zctx;1))`
 zclock:(`qzmq 2:(`zclock;1))`
 zfile:(`qzmq 2:(`zfile;1))`
