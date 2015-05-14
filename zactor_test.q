@@ -1,7 +1,7 @@
 // qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
 //   http://czmq.zeromq.org.
 //
-// Copyright (c) 2012, 2015 Jaeheum Han <jay.han@gmail.com>
+// Copyright (c) 2012-2015 Jaeheum Han <jay.han@gmail.com>
 // This file is part of qzmq.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -32,10 +32,10 @@ rc:zstr.send[a; `$"$TERM"]
 zactor.destroy[a]
 
 
-show"ping/pong"
+show"ping/pong, start with one pong, then four pongs, then eight."
 pong:{[pipe;args]
-    zsys.warning[`$"pong",(string args)," waiting for the ping"];
-    zsock.signal[pipe;0x0];
+    zsys.info[`$"pong",(string args)," waiting for the ping"];
+    zsock.signal[pipe; 0x0];
     while[not `ping~s:zstr.recv[pipe];
         do[1000*1000; md5 string args]];
     zstr.send[pipe; `pong]}
@@ -50,31 +50,28 @@ pong5:zactor.new[pong; i]; i+:1
 pong6:zactor.new[pong; i]; i+:1
 pong7:zactor.new[pong; i]; i+:1
 
-show""
-show"Make a pong spin with ~1 thread"
-do[10; zstr.send[pong0;`xtra]]
+show"Make a pong spin with 1 thread"
+do[10; zstr.send[pong0;`run]]
 
 zclock.sleep 15*500
 
-show""
-show"Make pongs spin more with ~4 threads"
-do[10; zstr.send[pong4;`xtra];
-            zstr.send[pong5;`xtra];
-            zstr.send[pong6;`xtra];
-            zstr.send[pong7;`xtra]];
+show"Make pongs spin more with 4 threads"
+do[10; zstr.send[pong4;`run];
+            zstr.send[pong5;`run];
+            zstr.send[pong6;`run];
+            zstr.send[pong7;`run]];
 
 zclock.sleep 15*500
 
-show""
-show"Make pongs spin more with ~8 threads"
-do[10; zstr.send[pong0;`xtra];
-            zstr.send[pong1;`xtra];
-            zstr.send[pong2;`xtra];
-            zstr.send[pong3;`xtra];
-            zstr.send[pong4;`xtra];
-            zstr.send[pong5;`xtra];
-            zstr.send[pong6;`xtra];
-            zstr.send[pong7;`xtra]];
+show"Make pongs spin more with 8 threads"
+do[10; zstr.send[pong0;`run];
+            zstr.send[pong1;`run];
+            zstr.send[pong2;`run];
+            zstr.send[pong3;`run];
+            zstr.send[pong4;`run];
+            zstr.send[pong5;`run];
+            zstr.send[pong6;`run];
+            zstr.send[pong7;`run]];
 
 zclock.sleep 20*500
 
@@ -108,4 +105,16 @@ zactor.destroy[pong6]
 zactor.destroy[pong7]
 
 \\
+
+/ Just for fun.
+
+compute:{[pipe;args] / args: (fn;xs) e.g. (sin;til 3)
+    zsock.signal[pipe; 0x0];
+    fn:first args;
+    xs:1 _ args;
+    while[not `ping~s:zstr.recv[pipe];
+        do[1000*1000; m:zstr.recv[pipe]];
+        fn xs]; / higher-order-prgramming made easy
+    zstr.send[pipe; `done]}
+
 

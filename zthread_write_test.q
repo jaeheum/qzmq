@@ -1,7 +1,7 @@
 // qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
 //   http://czmq.zeromq.org.
 //
-// Copyright (c) 2012, 2015 Jaeheum Han <jay.han@gmail.com>
+// Copyright (c) 2012-2015 Jaeheum Han <jay.han@gmail.com>
 // This file is part of qzmq.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this

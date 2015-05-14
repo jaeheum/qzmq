@@ -17,7 +17,7 @@ libzmq:(`qzmq 2:(`libzmq;1))`
     qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
     http://czmq.zeromq.org.
 
-    Copyright (c) 2012, 2015 Jaeheum Han <jay.han@gmail.com>
+    Copyright (c) 2012-2015 Jaeheum Han <jay.han@gmail.com>
 
     qzmq license is same as CZMQ's or Mozilla Public License version 2 (MPL v2).
 
