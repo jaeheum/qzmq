@@ -170,8 +170,7 @@ Z K1(zsockflush){PC(x); zsock_flush(VSK(x)); RZ;}
 Z K1(zsockis){PC(x); R kb(zsock_is(VSK(x)));}
 Z K1(zsockresolve){PC(x); R ptr(zsock_resolve(VSK(x)));}
 //zstr
-Z K1(zstrrecv){PC(x); R r1(ks(zstr_recv(VSK(x))));}
-Z K1(zstrfree){zstr_free(&xs); r0(x); RZ;}
+Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K is=ks(s); zstr_free(&s); R is;}
 Z K2(zstrsend){PC(x); R kj(zstr_send(VSK(x), ys));}
 Z K2(zstrsendm){PC(x); R kj(zstr_sendm(VSK(x), ys));}
 Z K3(zstrsendx){PC(x); R kj(zstr_sendx(VSK(x), ys, z->s, NULL));}
@@ -348,7 +347,6 @@ Z czmqzpi zsockapi[]={
     {NULL,NULL,NULL,0}};
 Z czmqzpi zstrapi[]={
     {"zstr", "recv", zstrrecv, 1},
-    {"zstr", "free", zstrfree, 1},
     {"zstr", "send", zstrsend, 2},
     {"zstr", "sendm", zstrsendm, 2},
     {"zstr", "sendx", zstrsendx, 3},
