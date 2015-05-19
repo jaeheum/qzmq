@@ -95,8 +95,11 @@ Instructions for builidng qzmq assumes `kdb+` is in `$HOME/q/` directory.
     # build czmq 32-bit version from github, install to ~/.czmq
     git clone git://github.com/zeromq/czmq
     cd czmq
+    mkdir $HOME/.czmq # an arbitrary location
     ./autogen.sh
     ./configure CFLAGS=-m32 --exec-prefix=$HOME/.czmq --prefix=$HOME/.czmq
+    make && make check # depending on HEAD version, self-tests could fail.
+    make install # install to $HOME/.czmq
     cd ..
     git clone git://github.com/jaeheum/qzmq
     cd qzmq
@@ -107,11 +110,15 @@ Instructions for builidng qzmq assumes `kdb+` is in `$HOME/q/` directory.
         -Wl,-rpath -Wl,/usr/lib/i386-linux-gnu \
         -Wl,-rpath -Wl,$HOME/.czmq/lib \
         -I./kx/kdb+3.0  -I/usr/include/ -I$HOME/.czmq/include \
-        -L./kx/kdb+3.0/l32 -L/usr/local/lib -L$HOME/.czmq/lib -lzmq -lczmq
+        -L./kx/kdb+3.0/l32 -L$HOME/.czmq/lib -lzmq -lczmq
     cp qzmq.q assert.q $HOME/q/
 
-For 64-bit kdb+, install `libzmq3-dev`,  drop `-m32` gcc flag and
-replace `l32` architecture path to appropriate one like `l64`.
+For 64-bit kdb+ on Ubuntu:
+
+* install `libzmq3-dev` (without `:i386` suffix)
+* drop `-m32` gcc flag
+* replace `l32` architecture path with `l64`
+* replace `/usr/lib/i386-linux-gnu` with `/usr/lib` (check `locate libzmq`).
 
 ## Running qzmq
 

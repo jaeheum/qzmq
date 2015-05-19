@@ -1,7 +1,7 @@
 
 Title: README
 
-Date: 20150515
+Date: 20150518
 
 <A name="toc1-6" title="qzmq" />
 # qzmq
@@ -26,9 +26,9 @@ it uses the [issue tracker][issues] for all issues and comments.
 &emsp;<a href="#toc2-70">Copyright and License</a>
 &emsp;<a href="#toc2-79">Files of qzmq</a>
 &emsp;<a href="#toc2-90">Building qzmq</a>
-&emsp;<a href="#toc2-122">Running qzmq</a>
-&emsp;<a href="#toc2-139">Issues</a>
-&emsp;<a href="#toc2-143"></a>
+&emsp;<a href="#toc2-129">Running qzmq</a>
+&emsp;<a href="#toc2-146">Issues</a>
+&emsp;<a href="#toc2-150"></a>
 
 <A name="toc2-26" title="Features of qzmq" />
 ## Features of qzmq
@@ -50,7 +50,7 @@ Because q has first-class functions qzmq can move code as well as data.
 ## CZMQ Coverage
 Qzmq covers a subset of [CZMQ APIs][czmq-reference].
 
-Mostly implemented as of 20150515:
+Mostly implemented as of 20150518:
 
 * [zactor - simple actor framework][zactor]
 * [zclock - millisecond clocks and delays][zclock]
@@ -108,8 +108,11 @@ Instructions for builidng qzmq assumes `kdb+` is in `$HOME/q/` directory.
     # build czmq 32-bit version from github, install to ~/.czmq
     git clone git://github.com/zeromq/czmq
     cd czmq
+    mkdir $HOME/.czmq # an arbitrary location
     ./autogen.sh
     ./configure CFLAGS=-m32 --exec-prefix=$HOME/.czmq --prefix=$HOME/.czmq
+    make && make check # depending on HEAD version, self-tests could fail.
+    make install # install to $HOME/.czmq
     cd ..
     git clone git://github.com/jaeheum/qzmq
     cd qzmq
@@ -120,13 +123,17 @@ Instructions for builidng qzmq assumes `kdb+` is in `$HOME/q/` directory.
         -Wl,-rpath -Wl,/usr/lib/i386-linux-gnu \
         -Wl,-rpath -Wl,$HOME/.czmq/lib \
         -I./kx/kdb+3.0  -I/usr/include/ -I$HOME/.czmq/include \
-        -L./kx/kdb+3.0/l32 -L/usr/local/lib -L$HOME/.czmq/lib -lzmq -lczmq
+        -L./kx/kdb+3.0/l32 -L$HOME/.czmq/lib -lzmq -lczmq
     cp qzmq.q assert.q $HOME/q/
 
-For 64-bit kdb+, install `libzmq3-dev`,  drop `-m32` gcc flag and
-replace `l32` architecture path to appropriate one like `l64`.
+For 64-bit kdb+ on Ubuntu:
 
-<A name="toc2-122" title="Running qzmq" />
+* install `libzmq3-dev` (without `:i386` suffix)
+* drop `-m32` gcc flag
+* replace `l32` architecture path with `l64`
+* replace `/usr/lib/i386-linux-gnu` with `/usr/lib` (check `locate libzmq`).
+
+<A name="toc2-129" title="Running qzmq" />
 ## Running qzmq
 
     # choose a *NEGATIVE* port number.
@@ -143,10 +150,10 @@ Translation of these examples to q is [under way][zguide-in-q]
 (pulled from [here][zguide-in-q-original]).
 See [Issue #5](https://github.com/jaeheum/qzmq/issues/5).
 
-<A name="toc2-139" title="Issues" />
+<A name="toc2-146" title="Issues" />
 ## Issues
 See the [issue tracker][issues].
-<A name="toc2-143" title="" />
+<A name="toc2-150" title="" />
 
 ---
 
