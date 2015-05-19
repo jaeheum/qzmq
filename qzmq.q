@@ -10,7 +10,6 @@ zmsg:(`qzmq 2:(`zmsg;1))`
 zsock:(`qzmq 2:(`zsock;1))`
 zstr:(`qzmq 2:(`zstr;1))`
 zsys:(`qzmq 2:(`zsys;1))`
-zthread:(`qzmq 2:(`zthread;1))`
 libzmq:(`qzmq 2:(`libzmq;1))`
 
 \

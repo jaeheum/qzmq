@@ -182,63 +182,6 @@ Z K1(zsysnotice){zsys_notice(xs); RZ;}
 Z K1(zsysinfo){zsys_info(xs); RZ;}
 Z K1(zsysdebug){zsys_debug(xs); RZ;}
 
-//zthread
-// Three-tier implementation of zthread:
-// - user-visible API zthread_new() and zthread_fork().
-// - APIs take typedef function pointers df() and af().
-// - user-defined q implementations of df() and af() are "called-back".
-////////////////////////////////////////////////////
-// q must be run with -p -negativeportnumber or in "multithread" mode.
-// Otherwise random SIGSEGV happens.
-////////////////////////////////////////////////////
-// q) qdf:{[args] ...}
-// q) zthread.new[qdf; args] / creates a new thread running qdf[zrgs]
-// q) ...
-ZK detachedfn;
-sem_t detachedfn_sem;
-ZV setdetachedfn(K x){if(xt==XD+1){detachedfn=x;}else{detachedfn=(K)0;} R;}
-// typedef void *(zthread_detached_fn) (void *args);
-ZV*df(V*args){
-    sem_post(&detachedfn_sem);
-    K x=dot(detachedfn, knk(1, d9(args)));
-    if(xt==-128){O("k() error: %s\n", xs);}
-    r0(x); m9();
-    R NULL;}
-// zthread_new(zthread_detached_fn *thread_fn, void* args);
-Z K2(zthreadnew){TC(x,XD+1);
-    sem_init(&detachedfn_sem, 0, 0);
-    setdetachedfn(x);
-    I newrc=zthread_new(df, b9(-1,y));
-    sem_wait(&detachedfn_sem);
-    sem_destroy(&detachedfn_sem);
-    R kj(newrc);}
-
-// q) qaf:{[args; ctx; pipe] ...}
-// q) pipe:zthread.fork[ctx; qaf; args]
-//      forks a thread running qaf[args], returns pipe for control.
-// q) ...
-ZK attachedfn;
-sem_t attachedfn_sem;
-ZV setattachedfn(K x){attachedfn=x; R;}
-ZV unsetattachedfn(K x){attachedfn=(K)0; R;}
-// typedef void (zthread_attached_fn) (void *args, zctx_t *ctx, void *pipe);
-ZV af(V* args, zctx_t*ctx, V*pipe){//TC(args,KB); PC(ctx); PC(pipe);
-    sem_post(&attachedfn_sem);
-    K x=dot(attachedfn, knk(3, d9(args), ptr(ctx), ptr(pipe)));
-    if(xt==-128){O("k() error: %s\n", xs);}
-    r0(x);
-    m9(); R;}
-// void* zthread_fork (zctx_t *ctx, zthread_attached_fn *thread_fn, void *args);
-// zthread.fork[ctx; af; args]
-Z K3(zthreadfork){PC(x);TC(y,XD+1);
-    sem_init(&attachedfn_sem, 0, 0);
-    setattachedfn(y);
-    V*pipe=zthread_fork((zctx_t*)VSK(x), af, b9(-1,z));
-    sem_wait(&attachedfn_sem);
-    sem_destroy(&attachedfn_sem);
-//    unsetattachedfn(y);
-    if(pipe){R ptr(pipe);}else{R krr("fork");}}
-
 // libzmq
 Z K0(version){K mnp=ktn(KI,3); zmq_version(&kI(mnp)[0],&kI(mnp)[1],&kI(mnp)[2]); R mnp;}
 Z K3(device){TC2(x,-KI,-KJ); IC(x); PC(y); PC(z); R kj(zmq_device(xi, VSK(y), VSK(z)));}
@@ -351,10 +294,6 @@ Z czmqzpi zstrapi[]={
     {"zstr", "sendm", zstrsendm, 2},
     {"zstr", "sendx", zstrsendx, 3},
     {NULL,NULL,NULL,0}};
-Z czmqzpi zthreadapi[] = {
-    {"zthread", "new", zthreadnew, 2},
-    {"zthread", "fork", zthreadfork, 3},
-    {NULL,NULL,NULL,0}};
 Z czmqzpi libzmqapi[] = {
     {"libzmq", "version", version, 0},
     {"libzmq", "device", device, 3},
@@ -383,7 +322,6 @@ EXPAPI(zmsg);
 EXPAPI(zsock);
 EXPAPI(zstr);
 EXPAPI(zsys);
-EXPAPI(zthread);
 EXPAPI(libzmq);
 
 //  Socket types, options, …
