@@ -143,6 +143,7 @@ Z K1(zsocknew){R ptr(zsock_new(xi));}
 Z K1(zsocknewpub){R ptr(zsock_new_pub(xs));}
 Z K2(zsocknewsub){R ptr(zsock_new_sub(xs,ys));}
 Z K1(zsocknewreq){R ptr(zsock_new_req(xs));}
+Z K1(zsocknewrep){R ptr(zsock_new_rep(xs));}
 Z K1(zsocknewdealer){R ptr(zsock_new_dealer(xs));}
 Z K1(zsocknewrouter){R ptr(zsock_new_router(xs));}
 Z K1(zsocknewpull){R ptr(zsock_new_pull(xs));}
@@ -261,6 +262,7 @@ Z czmqzpi zsockapi[]={
     {"zsock", "new_pub", zsocknewpub, 1},
     {"zsock", "new_sub", zsocknewsub, 2},
     {"zsock", "new_req", zsocknewreq, 1},
+    {"zsock", "new_rep", zsocknewrep, 1},
     {"zsock", "new_dealer", zsocknewdealer, 1},
     {"zsock", "new_router", zsocknewrouter, 1},
     {"zsock", "new_pull", zsocknewpull, 1},
