@@ -5,60 +5,62 @@ flags:.Q.def[`url`size`count!(`$"inproc://lat_test"; 30; 1000*1000)].Q.opt .z.x
 snd:zstr.send
 rcv:zstr.recv
 N:flags`count
-
-worker:{[pipe;args]
+S:flags`size
+/
+replier:{[pipe;args]
     zsock.signal[pipe; 0x0];
-    rep:zsock.new[zmq`REP];
-    port:zsock.connect[rep; flags`url];
+    rep:zsock.new_rep[flags`url];
     do[N; snd[rep; rcv[rep]]];
     zsock.destroy[rep]}
 
 m0:.Q.w[]
 show "m0:.Q.w[] / before running with zstr."
 show m0;
-req:zsock.new[zmq`REQ]
-port:zsock.bind[req; flags`url]
-pipe:zactor.new[worker; 0N]
+req:zsock.new_req[flags`url]
+pipe:zactor.new[replier; 0N]
 msg:`$(flags`size)#"0"
-starttime:.z.P / zclock.time[]
+starttime:.z.N
 do[N; snd[req; msg]; rcv[req]]
+elapsed:.z.N-starttime / in ns.
 show ".Q.w[]-m0 / after-before with zstr."
 show .Q.w[]-m0
 show ".Q.gc[]"
 .Q.gc[]
-elapsed:.z.P-starttime / in ns.
 show"message size: ", (string flags`size), " [B]"
 show"roundtrip count: ", (string N)
 show"average latency: ", (string (elapsed%(2*N))%1000), " [us]"
 zsock.destroy[req]
 zactor.destroy[pipe]
-
+\
 / redo with zmsg, not zstr.
-mworker:{[pipe;args]
+msnd:zmsg.send
+mrcv:zmsg.recv
+mdst:zmsg.destroy
+mprp:zmsg.prepend
+mnew:zmsg.new
+fnew:zframe.new
+
+replier:{[pipe;args]
     zsock.signal[pipe; 0x0];
-    rep:zsock.new[zmq`REP];
-    port:zsock.connect[rep; flags`url];
+    rep:zsock.new_rep[flags`url];
     do[N; msnd[mrcv[rep]; rep]];
     zsock.destroy[rep]}
 
-msnd:zmsg.send
-mrcv:zmsg.recv
 m0:.Q.w[]
 show "m0:.Q.w[] / before running with zmsg."
 show m0;
-req:zsock.new[zmq`REQ]
-port:zsock.bind[req; flags`url]
-pipe:zactor.new[mworker; 0N]
+req:zsock.new_req[flags`url]
+pipe:zactor.new[replier; 0N]
 msg:zmsg.new[]
 frame:zframe.new[(flags`size)#"0"]
 zmsg.prepend[msg; frame]
-starttime:.z.P / zclock.time[]
-do[N; msnd[msg; req]; mrcv[req]]
+starttime:.z.N
+do[N; mprp[m:mnew[]; f:fnew[S#"0"]]; msnd[m; req]; mdst mrcv[req]]
+elapsed:.z.N-starttime / in ns.
 show ".Q.w[]-m0 / after-before with zmsg."
 show .Q.w[]-m0
 show ".Q.gc[]"
 .Q.gc[]
-elapsed:.z.P-starttime / in ns.
 show"message size: ", (string flags`size), " [B]"
 show"roundtrip count: ", (string N)
 show"average latency: ", (string (elapsed%(2*N))%1000), " [us]"
@@ -71,7 +73,7 @@ zactor.destroy[pipe]
 \
 Copyright (c) 2012-2015 Jaeheum Han
 Translation of inproc_lat.cpp to use qzmq/czmq APIs.
-N.B. instead of spawning the worker thread by hand, we use an attached thread
+N.B. instead of spawning the replier thread by hand, we use an attached thread
 with zthread_fork.
 
 /*
