@@ -96,10 +96,11 @@ show""
 show"simple zmsg throughput with pub/sub and null subscription"
 publisher:{[pipe; args]
     zsock.signal[pipe; 0x0];
-    pubs:zsock.new_pub[flags`url];
     ae[`ready; rcv[pipe]];
+    pubs:zsock.new_pub[flags`url];
     do[N; mprp[m:mnew[]; f:fnew[S#"0"]];
         msnd[m; pubs]];
+    ae[`done; rcv[pipe]];
     zsock.destroy[pubs]}
 
 subs:zsock.new_sub[flags`url; `]
@@ -111,6 +112,7 @@ mdst mrcv subs
 starttime:.z.N / in ns
 do[N-1; mdst mrcv[subs]]
 elapsed:.z.N-starttime
+ae[0; rc:zstr.send[pipe; `done]]
 throughput:(N%elapsed)*(1000*1000*1000) / 1/s
 megabits:throughput*S*8%(1000*1000)
 show "mean throughput: ",(string throughput)," [msg/s]"
@@ -122,10 +124,11 @@ show""
 show"simple zmsg throughput with pub/sub matching subscription"
 publisher:{[pipe; args]
     zsock.signal[pipe; 0x0];
-    pubs:zsock.new_pub[flags`url];
     ae[`ready; rcv[pipe]];
+    pubs:zsock.new_pub[flags`url];
     do[N; mprp[m:mnew[]; f:fnew[S#"0"]];
         msnd[m; pubs]];
+    ae[`done; rcv[pipe]];
     zsock.destroy[pubs]}
 
 subs:zsock.new_sub[flags`url; `$S#"0"]
@@ -137,6 +140,7 @@ mdst mrcv subs
 starttime:.z.N / in ns
 do[N-1; mdst mrcv[subs]]
 elapsed:.z.N-starttime
+ae[0; rc:zstr.send[pipe; `done]]
 throughput:(N%elapsed)*(1000*1000*1000) / 1/s
 megabits:throughput*S*8%(1000*1000)
 show "mean throughput: ",(string throughput)," [msg/s]"
