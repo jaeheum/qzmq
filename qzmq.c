@@ -278,7 +278,7 @@ Z czmqzpi zsockapi[]={
     {"zsock", "endpoint", zsockendpoint, 1},
     {"zsock", "disconnect", zsockdisconnect, 2},
     {"zsock", "attach", zsockattach, 2},
-    {"zsock", "type_str", zsocktypestr, 2},
+    {"zsock", "type_str", zsocktypestr, 1},
     {"zsock", "send", zsocksend, 1},
     {"zsock", "recv", zsockrecv, 1},
     {"zsock", "bsend", zsockbsend, 1},
