@@ -2,73 +2,39 @@ flags:.Q.def[`url`size`count!(`$"inproc://lat_test"; 30; 1000*1000)].Q.opt .z.x
 \l qzmq.q
 \l assert.q
 
-snd:zstr.send
-rcv:zstr.recv
-N:flags`count
+U:flags`url
 S:flags`size
-/
-replier:{[pipe;args]
-    zsock.signal[pipe; 0x0];
-    rep:zsock.new_rep[flags`url];
-    do[N; snd[rep; rcv[rep]]];
-    zsock.destroy[rep]}
+N:flags`count
 
-m0:.Q.w[]
-show "m0:.Q.w[] / before running with zstr."
-show m0;
-req:zsock.new_req[flags`url]
-pipe:zactor.new[replier; 0N]
-msg:`$(flags`size)#"0"
-starttime:.z.N
-do[N; snd[req; msg]; rcv[req]]
-elapsed:.z.N-starttime / in ns.
-show ".Q.w[]-m0 / after-before with zstr."
-show .Q.w[]-m0
-show ".Q.gc[]"
-.Q.gc[]
-show"message size: ", (string flags`size), " [B]"
-show"roundtrip count: ", (string N)
-show"average latency: ", (string (elapsed%(2*N))%1000), " [us]"
-zsock.destroy[req]
-zactor.destroy[pipe]
-\
-/ redo with zmsg, not zstr.
-msnd:zmsg.send
-mrcv:zmsg.recv
-mdst:zmsg.destroy
-mprp:zmsg.prepend
-mnew:zmsg.new
 fnew:zframe.new
+fsnd:zframe.send
+frcv:zframe.recv
+fdst:zframe.destroy
+REUSE:zmq`ZFRAME_REUSE
 
+show"message size: ", (string S), " [B]";
+show"roundtrip count: ", (string N);
+
+requester:{[pipe; args]
+    zsock.signal[pipe; 0x0];
+    req:zsock.new_req U;
+    payload:S#0xff;
+    f:fnew payload;
+    starttime:.z.N;
+    do[N; fsnd[f; req; REUSE]; fdst frcv req];
+    elapsed:.z.N-starttime; / in ns.
+    show"average latency: ", (string (elapsed%(2*N))%1000), " [us]";
+    zsock.destroy req}
 replier:{[pipe;args]
     zsock.signal[pipe; 0x0];
-    rep:zsock.new_rep[flags`url];
-    do[N; msnd[mrcv[rep]; rep]];
-    zsock.destroy[rep]}
-
-m0:.Q.w[]
-show "m0:.Q.w[] / before running with zmsg."
-show m0;
-req:zsock.new_req[flags`url]
-pipe:zactor.new[replier; 0N]
-msg:zmsg.new[]
-frame:zframe.new[(flags`size)#"0"]
-zmsg.prepend[msg; frame]
-starttime:.z.N
-do[N; mprp[m:mnew[]; f:fnew[S#"0"]]; msnd[m; req]; mdst mrcv[req]]
-elapsed:.z.N-starttime / in ns.
-show ".Q.w[]-m0 / after-before with zmsg."
-show .Q.w[]-m0
-show ".Q.gc[]"
-.Q.gc[]
-show"message size: ", (string flags`size), " [B]"
-show"roundtrip count: ", (string N)
-show"average latency: ", (string (elapsed%(2*N))%1000), " [us]"
-zsock.destroy[req]
-zactor.destroy[pipe]
+    rep:zsock.new_rep U;
+    do[N; fsnd[frcv rep; rep; 0]];
+    zsock.destroy rep}
+reply:zactor.new[replier; 0N]
+request:zactor.new[requester; 0N]
+zactor.destroy reply
+zactor.destroy request
 \\
-
-
 
 \
 Copyright (c) 2012-2015 Jaeheum Han
