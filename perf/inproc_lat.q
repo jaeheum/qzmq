@@ -10,6 +10,7 @@ fnew:zframe.new
 fsnd:zframe.send
 frcv:zframe.recv
 fdst:zframe.destroy
+/ frad:fdst frcv@
 REUSE:zmq`ZFRAME_REUSE
 
 show"message size: ", (string S), " [B]";
@@ -35,6 +36,31 @@ request:zactor.new[requester; 0N]
 zactor.destroy reply
 zactor.destroy request
 \\
+# inproc latency numbers
+
+qzmq has
+
+* 1 or 2 us latency overhead over CZMQ
+* 2 or 3 us latency overhead over libzmq
+
+    libzmq: 6.5 us (+/- 0.1 us)
+    czmq:   7.5 us
+    qzmq:   8.5 us / this version
+    inline: 8.0 us (make one "inlined" call each in the do loop)
+    qzmq*:   9.5 us / without dictionary lookup shortcuts
+
+## dictionary lookups
+
+Dictionary lookup costs about 100 ms per million calls or 0.1 us per call.
+Use shortcuts to reduce latency inside a loop.
+
+## hardware used
+
+    $ grep CPU /proc/cpuinfo
+    model name      : Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+    model name      : Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+    model name      : Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+    model name      : Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
 
 \
 Copyright (c) 2012-2015 Jaeheum Han
