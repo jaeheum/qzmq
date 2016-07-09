@@ -1,7 +1,7 @@
 // qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
 //   http://czmq.zeromq.org.
 //
-// Copyright (c) 2012-2015 Jaeheum Han <jay.han@gmail.com>
+// Copyright (c) 2012-2016 Jaeheum Han <jay.han@gmail.com>
 // This file is part of qzmq.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -48,49 +48,6 @@ ZI N(K x){if(xt>0)R xn;R 1;} // x->n may be unset for n=1.
 #define D(x)
 #endif
 
-//zactor
-ZK actorfn;
-sem_t actorfn_sem;
-//typedef void (zactor_fn) (zsock_t *pipe, void *args);
-ZV task(zsock_t *pipe, void *args){
-    sem_post(&actorfn_sem);
-    K x=dot(actorfn, knk(2, ptr(pipe), d9(args)));
-    if(xt==-128){O("k() error: %s\n", xs);}
-    r0(x);
-    m9(); R;}
-// zactor_new(zactor_fn *task, void *args)
-Z K2(zactornew){
-    sem_init(&actorfn_sem,0,0);
-    actorfn=x;
-    zactor_t*a=zactor_new(task,b9(-1,y));
-    sem_wait(&actorfn_sem);
-    sem_destroy(&actorfn_sem);
-    if(a){R ptr(a);}else{R krr("zactor_new");}
-}
-Z K1(zactordestroy){PC(x); ZTK(zactor_t,a); zactor_destroy(&a); RZ;}
-Z K2(zactorsend){PC(x); PC(y); zmsg_t*m=(zmsg_t*)(intptr_t)(y->j);
-    R kj(zactor_send(VSK(x), &m));}
-Z K1(zactorrecv){PC(x); R ptr(zactor_recv(VSK(x)));}
-Z K1(zactoris){PC(x); R kb(zactor_is(VSK(x)));}
-Z K1(zactorresolve){PC(x); R ptr(zactor_resolve(VSK(x)));}
-Z K1(zactorsock){PC(x); R ptr(zactor_sock(VSK(x)));}
-
-//zclock (kept for zthread & testing)
-Z K1(zclocksleep){TC2(x,-KI,-KJ); IC(x); zclock_sleep(xi); RZ;}
-
-//zctx (kept for zthread)
-Z K0(zctxnew){zctx_t*ctx=zctx_new(); P(ctx, ptr(ctx)); R KRR(errno);}
-Z K1(zctxdestroy){PC(x); ZTK(zctx_t,ctx); zctx_destroy(&ctx); RZ;}
-Z K2(zctxsetiothreads){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_iothreads(VSK(x), yi); RZ;}
-Z K2(zctxsetlinger){PC(x); TC2(y,-KI,-KJ); IC(y); zctx_set_linger(VSK(x), yi); RZ;}
-Z K0(zctxinterrupted){R kb(zctx_interrupted);}
-
-//zfile `:path (kept for zthread & testing)
-Z K1(zfiledelete){TC(x,-KS); R kj(zfile_delete(++xs));}
-Z K1(zfilemkdir){TC(x,-KS); R kj(zfile_mkdir(++xs));}
-Z K1(zfileexists){TC(x,-KS); R kj(zfile_exists(++xs));}
-Z K1(zfilesize){TC(x,-KS); R kj(zfile_size(++xs));}
-
 //zframe
 Z K1(zframenew){P((abs(xt)!=KG&&abs(xt)!=KC), krr("type"));
     if(xt>0){zframe_t*f=zframe_new(xG, xn); P(f, ptr(f)); RZ;}
@@ -132,8 +89,6 @@ Z K1(zmsgpopstr){PC(x); R ks(zmsg_popstr(VSK(x)));}
 Z K1(zmsgfirst){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
 Z K1(zmsgnext){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
 Z K1(zmsglast){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_last(VSK(x)))); R krr("empty");}
-Z K2(zmsgsave){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "w+"); I rc=zmsg_save(VSK(x), f); fclose(f); R kj(rc);}
-Z K2(zmsgload){PC(x); TC(y,-KS); FILE*f=fopen(++ys, "r"); zmsg_t*m=zmsg_load(VSK(x), f); fclose(f); R ptr(m);}
 Z K1(zmsgdup){PC(x); zmsg_t*m=zmsg_dup(VSK(x)); P(m,ptr(m)); RZ;}
 Z K1(zmsgprint){PC(x); zmsg_print(VSK(x)); RZ;}
 Z K1(zmsgis){PC(x); R kb(zmsg_is(VSK(x)));}
@@ -189,31 +144,6 @@ Z K3(device){TC2(x,-KI,-KJ); IC(x); PC(y); PC(z); R kj(zmq_device(xi, VSK(y), VS
 
 // apiname because reflection is impossible.
 typedef struct {S apiname; S fnname; V* fn; I argc;} czmqzpi;
-Z czmqzpi zactorapi[]={
-    {"zactor", "new", zactornew, 2},
-    {"zactor", "destroy", zactordestroy, 1},
-    {"zactor", "send", zactorsend, 2},
-    {"zactor", "recv", zactorrecv, 1},
-    {"zactor", "is", zactoris, 1},
-    {"zactor", "resolve", zactorresolve, 1},
-    {"zactor", "sock", zactorsock, 1},
-    {NULL,NULL,NULL,0}};    
-Z czmqzpi zctxapi[]={
-    {"zctx", "new", zctxnew, 0},
-    {"zctx", "destroy", zctxdestroy, 1},
-    {"zctx", "set_iothreads", zctxsetiothreads, 2},
-    {"zctx", "set_linger", zctxsetlinger, 2},
-    {"zctx", "interrupted", zctxinterrupted, 0},
-    {NULL,NULL,NULL,0}};
-Z czmqzpi zclockapi[]={
-    {"zclock", "sleep", zclocksleep, 1},
-    {NULL,NULL,NULL,0}};
-Z czmqzpi zfileapi[]={
-    {"zfile", "delete", zfiledelete, 1,},
-    {"zfile", "mkdir", zfilemkdir, 1},
-    {"zfile", "exists", zfileexists, 1},
-    {"zfile", "size", zfilesize, 1,},
-    {NULL,NULL,NULL,0}};
 Z czmqzpi zframeapi[]={
     {"zframe", "new", zframenew, 1},
     {"zframe", "empty", zframeempty, 0},
@@ -251,8 +181,6 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "first", zmsgfirst, 1},
     {"zmsg", "next", zmsgnext, 1},
     {"zmsg", "last", zmsglast, 1},
-    {"zmsg", "save", zmsgsave, 2},
-    {"zmsg", "load", zmsgload, 2},
     {"zmsg", "dup", zmsgdup, 1},
     {"zmsg", "print", zmsgprint, 1},
     {"zmsg", "is", zmsgis, 1},
@@ -315,10 +243,6 @@ Z czmqzpi zsysapi[]={
     DO(n, APITAB(name##api[i].fnname, name##api[i].fn, name##api[i].argc)); \
     R xD(x,y);}
 
-EXPAPI(zactor);
-EXPAPI(zctx);
-EXPAPI(zclock);
-EXPAPI(zfile);
 EXPAPI(zframe);
 EXPAPI(zmsg);
 EXPAPI(zsock);

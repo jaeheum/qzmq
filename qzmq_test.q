@@ -1,7 +1,7 @@
 // qzmq - q bindings for CZMQ, the high-level C binding for 0MQ:
 //   http://czmq.zeromq.org.
 //
-// Copyright (c) 2012-2015 Jaeheum Han <jay.han@gmail.com>
+// Copyright (c) 2012-2016 Jaeheum Han <jay.han@gmail.com>
 // This file is part of qzmq.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -64,10 +64,6 @@ msg:zmsg.recv[input]
 ae[10; zmsg.size[msg]]
 ae[60; zmsg.content_size[msg]]
 zmsg.print[msg]
-ae[0; zmsg.save[msg; `:zmsg.test]]
-ae[10; zmsg.size[msg:zmsg.load[zmsg.new[]; `:zmsg.test]]]
-ae[60; zmsg.content_size[msg]]
-ae[0; rc:zfile.delete[`:zmsg.test]]
 zmsg.destroy[msg]
 msg:zmsg.new[]
 ae[0; zmsg.size[msg]]
@@ -82,7 +78,6 @@ zsock.destroy[output]
 show"pass"
 //  --------------------------------------------------------------------------
 show"running zsock test"
-/ctx:zctx.new[]
 writer:zsock.new[zmq`PUSH]
 reader:zsock.new[zmq`PULL]
 service:5560
@@ -113,8 +108,6 @@ i:0; do[10; m:zstr.recv[input]; ae[m;`$"☺⌃⌥⌘↩",string i]; i+:1]
 zsock.destroy[input]
 zsock.destroy[output]
 show"pass"
-//  --------------------------------------------------------------------------
-show"see zthread_test.q for thread testing."
 //  --------------------------------------------------------------------------
 "qzmq test done"
 
