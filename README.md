@@ -1,7 +1,7 @@
 
 Title: README
 
-Date: 20160709
+Date: 20180205
 
 <A name="toc1-9" title="qzmq" />
 # qzmq
@@ -33,6 +33,12 @@ it uses the [issue tracker][issues] for all issues and comments.
 
 <A name="toc2-29" title="News" />
 ## News
+## News
+This release of qzmq is different from 20160207 release:
+
+- merged pull request #15 from jhanna-kx/master
+- added Apache 2 license
+
 This release of qzmq is different from 20150518 (3.0.1) release:
 
 - deprecated `zactor` or concurrency support
@@ -94,11 +100,12 @@ zuuid or UUID support, zlist or generic container, etc.
     // License, v. 2.0. If a copy of the MPL was not distributed with this
     // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+    // Alternatively you may use Apache 2.0 license instead of MPL
+
 <A name="toc2-92" title="Files of qzmq" />
 ## Files of qzmq
 
-* README.md -- README.txt in Markdown syntax thanks to [Gitdown][gitdown].
-* README.txt -- this file.
+* README.md
 * kx/* -- `k.h` and `c.o` from kx.com for building qzmq. (see [kx.com terms and conditions][kxtoc])
 * qzmq.c -- C bindings to be linked with CZMQ (with ØMQ) and Q (`k.h` and `c.o`).
 * qzmq.q -- q code used to load the bindings.
@@ -144,8 +151,6 @@ See the [issue tracker][issues].
 
 ---
 
-`README.txt` is written in [Gitdown][gitdown].
-
 [qzmq]: https://github.com/jaeheum/qzmq
 [zeromq]: http://www.zeromq.org
 [czmq]: http://czmq.zeromq.org
@@ -161,7 +166,3 @@ See the [issue tracker][issues].
 [zguide]: http://zguide.zeromq.org
 [zguide-in-q]:https://github.com/imatix/zguide/tree/master/examples/Q
 [zguide-in-q-original]:https://github.com/jaeheum/zguide/tree/master/examples/Q
-[gitdown]: https://github.com/zeromq/gitdown
-
-
-_This documentation was generated from qzmq/README.txt using [Gitdown](https://github.com/zeromq/gitdown)_
