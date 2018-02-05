@@ -70,6 +70,7 @@ Z K1(zframeis){PC(x); R kb(zframe_is(VSK(x)));}
 Z K0(zmsgnew){zmsg_t*m=zmsg_new(); P(m, ptr(m)); RZ;}
 Z K1(zmsgdestroy){PC(x); ZTK(zmsg_t,m); zmsg_destroy(&m); RZ;}
 Z K1(zmsgrecv){PC(x); R ptr(zmsg_recv(VSK(x)));}
+Z K1(zmsgrecvnowait){PC(x); R ptr(zmsg_recv_nowait(VSK(x)));}
 Z K2(zmsgsend){PC(x); PC(y); ZTK(zmsg_t,m); R kj(zmsg_send(&m, VSK(y)));}
 Z K1(zmsgsize){PC(x); R kj(zmsg_size(VSK(x)));}
 Z K1(zmsgcontentsize){PC(x); R kj(zmsg_content_size(VSK(x)));}
@@ -81,10 +82,13 @@ Z K1(zmsgpushmem){PC(x); R krr("nyi");}
 Z K1(zmsgaddmem){PC(x); R krr("nyi");}
 
 Z K2(zmsgpushstr){PC(x); R kj(zmsg_pushstr(VSK(x), ys));}
+Z K2(zmsgpushC){PC(x);TC(y,KC);R kj(zmsg_pushmem(VSK(x),kC(y),(size_t)y->n));}
 Z K2(zmsgaddstr){PC(x); R kj(zmsg_addstr(VSK(x), ys));}
+Z K2(zmsgaddC){PC(x);TC(y,KC);R kj(zmsg_addmem(VSK(x),kC(y),(size_t)y->n));}
 Z K2(zmsgpushstrf){PC(x); R krr("nyi");}
 Z K2(zmsgaddstrf){PC(x); R krr("nyi");}
 Z K1(zmsgpopstr){PC(x); R ks(zmsg_popstr(VSK(x)));}
+Z K1(zmsgpopC){PC(x);if(zmsg_size(VSK(x))==0)R krr("empty");zframe_t* f=zmsg_pop(VSK(x));size_t msz=zframe_size(f);K r=ktn(KC,(J)msz);memcpy(kG(r),zframe_data(f),msz);R r;}
 
 Z K1(zmsgfirst){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_first(VSK(x)))); R krr("empty");}
 Z K1(zmsgnext){PC(x); P(zmsg_size(VSK(x))>0, ptr(zmsg_next(VSK(x))));  R krr("empty");}
@@ -125,6 +129,7 @@ Z K1(zsockwait){PC(x); R kj(zsock_wait(VSK(x)));}
 Z K1(zsockflush){PC(x); zsock_flush(VSK(x)); RZ;}
 Z K1(zsockis){PC(x); R kb(zsock_is(VSK(x)));}
 Z K1(zsockresolve){PC(x); R ptr(zsock_resolve(VSK(x)));}
+Z K1(zsockfd){PC(x);R ki(zsock_fd(VSK(x)));}
 //zstr
 Z K1(zstrrecv){PC(x); S s=zstr_recv(VSK(x)); K is=ks(s); zstr_free(&s); R is;}
 Z K2(zstrsend){PC(x); R kj(zstr_send(VSK(x), ys));}
@@ -164,6 +169,7 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "new", zmsgnew, 0},
     {"zmsg", "destroy", zmsgdestroy, 1},
     {"zmsg", "recv", zmsgrecv, 1},
+    {"zmsg", "recvnowait", zmsgrecvnowait, 1},
     {"zmsg", "send", zmsgsend, 2},
     {"zmsg", "size", zmsgsize, 1},
     {"zmsg", "content_size", zmsgcontentsize, 1},
@@ -172,11 +178,14 @@ Z czmqzpi zmsgapi[]={
     {"zmsg", "pop", zmsgpop, 1},
     {"zmsg", "pushmem", zmsgpushmem, 1},
     {"zmsg", "addmem", zmsgaddmem, 1},
-    {"zmsg", "pushstr", zmsgpushstr, 1},
-    {"zmsg", "addstr", zmsgaddstr, 1},
+    {"zmsg", "pushstr", zmsgpushstr, 2},
+    {"zmsg", "pushC", zmsgpushC, 2},
+    {"zmsg", "addstr", zmsgaddstr, 2},
+    {"zmsg", "addC", zmsgaddC, 2},
     {"zmsg", "pushstrf", zmsgpushstrf, 1},
     {"zmsg", "addstrf", zmsgaddstrf, 2},
     {"zmsg", "popstr", zmsgpopstr, 1},
+    {"zmsg", "popC", zmsgpopC, 1},
 
     {"zmsg", "first", zmsgfirst, 1},
     {"zmsg", "next", zmsgnext, 1},
@@ -217,6 +226,7 @@ Z czmqzpi zsockapi[]={
     {"zsock", "flush", zsockflush, 1},
     {"zsock", "is", zsockis, 1},
     {"zsock", "resolve", zsockresolve, 1},
+    {"zsock", "fd", zsockfd, 1},
     {NULL,NULL,NULL,0}};
 Z czmqzpi zstrapi[]={
     {"zstr", "recv", zstrrecv, 1},
@@ -242,7 +252,6 @@ Z czmqzpi zsysapi[]={
 #define EXPAPI(name) K1(name){int n=tblsize(name##api)-1; K y=ktn(0,n);x=ktn(KS,n); \
     DO(n, APITAB(name##api[i].fnname, name##api[i].fn, name##api[i].argc)); \
     R xD(x,y);}
-
 EXPAPI(zframe);
 EXPAPI(zmsg);
 EXPAPI(zsock);
